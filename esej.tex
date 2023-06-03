@@ -1,0 +1,61 @@
+\documentclass[12pt]{scrartcl}
+\usepackage[utf8]{inputenc}
+\usepackage[croatian]{babel}
+\usepackage[unicode]{hyperref}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage{thmtools}
+\usepackage{csquotes}
+\usepackage[backend=biber]{biblatex}
+\addbibresource{literatura.bib}
+\MakeOuterQuote{"}
+\declaretheorem{teorem}
+\declaretheorem[style=definition,sibling=teorem,qed=$\vartriangleleft$]{definicija}
+
+\newcommand{\T}{^\mathsf T}
+\newcommand{\mat}[1]{%
+    \ifmmode%
+        \mathbf{#1}%
+    \else%
+        $\mathbf{#1}$%
+    \fi%
+}
+\newcommand{\vek}[1]{\mat{#1}}
+
+\author{Mauro Raguzin}
+\title{Korijen --- 1 algoritam, 3 implementacije}
+\date{\today}
+
+\begin{document}
+\maketitle
+\tableofcontents
+\pagebreak
+
+\section{Uvod}
+%V1:Ovaj esej se bavi naoko jednostavnim i elementarnim numeričkim algoritmom: računom kvadratnog korijena. Iako u osnovi poznat tisućama godina,
+%ovaj algoritam ima fascinantan broj varijacija, što u njegovoj osnovnoj konceptualizaciji neovisnoj o namijenjenom izvršitelju, što u konkretnim
+%formama koje dobiva u ovisnosti o različitim računalnim arhitekturama na kojima se povijesno implementirao.
+Izračunati kvadratnoi korijen --- koliko bi to moglo biti teško? Iako u osnovi poznat tisućama godina,
+ovaj algoritam ima fascinantan broj varijacija, što u njegovoj osnovnoj konceptualizaciji neovisnoj o namijenjenom izvršitelju, što u konkretnim
+formama koje dobiva u ovisnosti o različitim računalnim arhitekturama na kojima se povijesno implementirao.
+
+U ovom eseju obrađujemo u detalje ovaj algoritam kroz povijest, od TODO!! do današnjeg kompjutoriziranog doba u kojem su precizne i vrlo efikasne varijante
+ovog algoritma od presudne važnosti u najrazličitijim poljima primjene, poput simulacije, digitalne fizike i računalne grafike. Usput ćemo predstaviti
+i neke analize posebno zanimljivih modernih računalnih implementacija te predstaviti mjerenja obavljena na današnjim računalima za različite implementacije.
+% TODO: zašto baš tri implementacije? Navedi tu ukratko razlog + koliko smo ih ustvari točno obradili!
+
+\section{Povijest računa kvadratnog korijena}
+\begin{quotation}
+    Seeing there is nothing that is so troublesome to Mathematicall practise, nor that doth more molest and hinder Calculators,
+    then the Multiplications, Diuisions, square and cubical Extractions of great numbers, which besided the tedious expence
+    of time, are for the most part subiect to many slippery errors. I began therefore to consider in my minde, by what certaine
+    and ready Art I might remoue those hindrances.\cite[str.~194]{taocp2}
+    \begin{flushright}
+        ---John Napier (1616.)
+    \end{flushright}
+\end{quotation}
+
+
+\printbibliography
+
+\end{document}
