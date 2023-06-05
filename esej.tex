@@ -219,11 +219,19 @@ da su sve vrijednosti niza $c_k$ negativne te da taj niz konvergira ka $0$. Iz \
 $|a_k|^n<|y^n/x|$, iz čega možemo zaključiti da je $|a_k|<1$ (skalirano) čim je konačan rezultat isto takav.
 
 Za dobiti formule specifično za račun kvadratnog korijena od $x$, odabiremo $a_0=y=x$ i $c_0=x-1$ te $n=2$, što nam daje:
+% \begin{equation}
+%     \begin{aligned}\label{eq:sqrtedsac}
+%         a_{k+1} &= a_k\left(1-\frac12 c_k\right)\\
+%         c_{k+1} &= \frac14 c^2_k(c_k-3)\text.
+%     \end{aligned}
+% \end{equation}
 \begin{equation}
-    \begin{aligned}\label{eq:sqrtedsac}
+\left.
+    \begin{array}{cc}
+    \label{eq:sqrtedsac}
         a_{k+1} &= a_k\left(1-\frac12 c_k\right)\\
         c_{k+1} &= \frac14 c^2_k(c_k-3)\text.
-    \end{aligned}
+\end{array}\right\}
 \end{equation}
 U ovom posebnom slučaju se konvergencija $a_k\to\sqrt x$ može lako provjeriti direktno po definiciji konvergencije
 niza koji je monotono padajući (unutar legalnog raspona $x$-a vrijedi da su sve $c_k$ vrijednosti negativne te rastu tj.
@@ -243,7 +251,7 @@ kako bi račun korijena bez gubitka prepolovio eksponent.
 Iz svega navedenog možemo uočiti da je područje konvergencije ovog algoritma, pogotovo za nama najzanimljiviji slučaj $n=2$, izrazito usko
 (u tom slučaju vidimo da je riječ o podskupu od $\{x\mid x\in\left[0,3\right\rangle\}$ za kojeg jedino i možemo primijeniti ovaj algoritam), pa je
 zaista bitno primijeniti dosta pred- i post-procesiranja kako bi se izvuklo maksimalno preciznosti iz ovog algoritma.
-Gower u \cite{gower} preporučuje raspon ciljni $(\frac12)^n\leq x<1$.
+Gower u \cite{gower} preporučuje ciljni raspon $(\frac12)^n\leq x<1$.
 Za računala za koja je
 ovaj algoritam bio
 namijenjen, to je bila i jedina moguća relativno efikasna opcija.
@@ -258,36 +266,36 @@ Riječ je o metodi kojom ljudi mogu dosta efikasno na papiru izračunati korijen
 što u svakoj iteraciji daje samo jednu novu znamenku rezultata. Ipak, popularna je i dandanas upravo zbog svoje jednostavnosti te je
 poznato da su neki rani ručni kalkulatori, poput Napierovih kosti (17.\ st.), koristili ovu metodu.
  Opisat ćemo je primjerom
-u dekadskom brojevnom sustavu, a nakon toga formalizirati točan postupak za nama zanimljiv binarni sustav.
+u dekadskom brojevnom sustavu, a nakon toga formalizirati točan postupak za nama posebno zanimljiv binarni sustav.
 
-\primjer{Izračunati $\sqrt{891}$.}
+\primjer{Izračunati $\sqrt{819}$.}
 {Kako smo u dekadskom sustavu, znamo da troznamenkasti brojevi mogu imati najviše dvoznamekasti korijen; općenito, $k$-znamenkasti broj
-može imati najviše $\lceil\\frac{k}{2}\rceil$-znamenkasti korijen. Mi u biti želimo "riješiti jednadžbu" $(10x+y)^2+z=891$, gdje je 
+može imati najviše $\lceil\frac{k}{2}\rceil$-znamenkasti korijen. Mi u biti želimo "riješiti jednadžbu" $(10x+y)^2+z=819$ za $x$ i $y$, gdje je 
 "ostatak" $z$ potreban jer očekujemo da nam argument neće biti savršeni kvadrat. U tu svrhu krećemo od najznačajnije znamenke rješenja
 $x$ --- koja je najveća znamenka koja, kvadrirana i pomnožena sa $100$, daje broj manji ili jednak $891$? Nalazimo da je to $x=2$, pa
-uvrstimo to u jednadžbu i tražimo dalje $y$. Budući smo razriješili najznačajniji dio rezultata, možemo oduzeti dobiveni $400$ od $891$,
-dobiti $40y+y^2=419$
+uvrstimo to u jednadžbu i tražimo dalje $y$. Budući smo razriješili najznačajniji dio rezultata, možemo oduzeti dobiveni $400$ od $819$,
+dobiti $40y+y^2+z=419$
 i nastaviti pretragu kao prije. Tako nalazimo $y=8$ i, kako uvrštavanje u jednadžbu ne daje točno $419$,
-znamo da imamo "ostatak" $z>0$. No, nama on nije bitan, pa budući da ustvari računamo $\lfloor\sqrt{891}\rfloor$,
- dovoljno je vratiti naš dobiveni rezultat kao konačno rješenje.}
+znamo da imamo "ostatak" $z>0$. No, nama on nije bitan budući da ustvari računamo $\lfloor\sqrt{819}\rfloor$, pa je
+ dovoljno vratiti naš dobiveni rezultat kao konačno rješenje.}
 
 Općenito, ovaj algoritam se svodi na iterativno traženje najvećeg jednozamenkastog
-broja koji zadovoljava da mu je izračunata vrijednost preostalog dijela binomne jednadžbe manja ili jednaka (preostalom) argumentu, sve
-dok odredimo vrijednosti svih nepoznanica.
+broja koji zadovoljava da mu je izračunata vrijednost preostalog dijela multinomne jednadžbe manja ili jednaka (preostalom) argumentu, sve
+dok ne odredimo vrijednosti svih nepoznanica.
 
-Formalno, imamo zadan $N\in\mathbb N$ i tražimo znamenke $a_1,\dotsc a_n$ ($a_0$ je \emph{najznačajnija}; $a_i$-jevi 
+Formalno, imamo zadan $N\in\mathbb N$ i tražimo znamenke $a_1,\dotsc a_n$ ($a_1$ je \emph{najznačajnija}; $a_i$-jevi 
 dakako uključuju i odgovarajuću potenciju baze $B$) tako da vrijedi 
 \begin{equation}
     N=\left(\sum^n_{i=1}a_i\right)^2+z=N,
 \end{equation}
-gdje je $n=\lfloor \frac{\log_B N + 1}{2}\rfloor$.
+gdje je $n=\left\lfloor \dfrac{\log_B N + 1}{2}\right\rfloor$.
 Iskoristimo multinomni teorem za dobiti raspis:
 \begin{equation}\label{eq:multiraspis}  %% TODO: pravilni stacking sume ispod!!
-    N=\sum^n_{i=1}a^2_i+2\sum^n_{i=0,\\i<j}\sum^n_{j=0}a_ia_j+z=N\text.
+    N=\sum^n_{i=1}a^2_i+2\sum^n_{i=0,\\i<j}\sum^n_{j=0}a_ia_j+z\text.
 \end{equation}
 Tražeći rekurzivnu strukturu u formuli \eqref{eq:multiraspis}, grupiramo sumande ovako:
 \begin{equation}
-    N=a^2_0+a_1(2a_0+a_1)+a_2(2a_0+2a_1+a_2)+\dotsb+a_n(2\sum^n_{i=1}a_i + a_n)\text.
+    N=a^2_0+a_1(2a_0+a_1)+a_2(2a_0+2a_1+a_2)+\dotsb+a_n\left(2\sum^n_{i=1}a_i + a_n\right)\text.
 \end{equation}
 Sada možemo izraziti opisan iterativni račun pomoću rekurzivne relacije, za $k\geq 1$:
 %\begin{equation}
@@ -297,14 +305,22 @@ Sada možemo izraziti opisan iterativni račun pomoću rekurzivne relacije, za $
     P_k&=\sum^k_{i=1}a_i\text.
     \end{align}
 %\end{equation}
-Uz $Y_{-1}=0$ i $Y_0:=a_0^2$, vidimo da vrijedi $N=\sum^n_{i=0} Y_i$, stoga je moguće progresivno aproksimirati korijen od $N$ traženjem redom takvih
-$a_0,a_1,\dotsc$ da vrijedi $Y_k\geq Y_{k-1}$ i $S_k:=\sum^k_{i=0} Y_i\leq N$. Ako na početku bilo koje iteracije $k$ detektiramo da vrijedi
-$S_k=0$, tada znamo da smo gotovi ranije od maksimalnog mogućeg broja iteracija, koji je jednak poziciji najznačajnije (ne-nula) znamenke broja $N$
-(no u praksi se ovaj algoritam izvodi na računalima gdje ćemo, zbog fiksnih i relativno malih širina registara, uvijek kretati od najviše bit-pozicije).
+Uz $P_0=0$, vidimo da vrijedi $N=\sum^n_{i=1} Y_i$, stoga je moguće progresivno aproksimirati korijen od $N$ tražeći redom takve
+$a_1,a_2,\dotsc$ da vrijedi $Y_k\geq Y_{k-1}$ i $S_k:=\sum^k_{i=0} Y_i\leq N$. Ako na početku bilo koje iteracije $k$ detektiramo da vrijedi
+$S_k=N$, tada znamo da smo gotovi ranije od maksimalnog mogućeg broja iteracija, koji je jednak polovici pozicije %% TODO: je li zaista?!
+najznačajnije (ne-nula) znamenke broja
+$N$\footnote{U praksi se ovaj algoritam izvodi na računalima gdje ćemo, zbog fiksnih
+i relativno malih širina registara, uvijek kretati od najviše bitovne pozicije (ovo ima smisla do oko $32$ bita).
+Naravno da onda postoje i varijante u kojima se pokušava na razne načine
+zaobići potreba prolaska kroz svaki bit od najvišeg uz obavljanje cijelog računa svaki put, što može dovesti do ubrzanja, ali samo uz povećanje
+prostorne složenosti jer nam tada treba barem nekakva konstantna tablica vrijednosti u memoriji.
+Jedan takav algoritam, zasnovan na tablici i malom broju računskih operacija,
+bit će obrađen zadnji.}.
 
-Ovo je sasvim generički opis, neovisan o bazi $B$, no mnoge zanimljive i specifične
+Ovo je bio sasvim generički opis, neovisan o bazi $B$, no mnoge zanimljive i specifične
  optimizacije su moguće upravo u slučaju koji nas zanima za računalnu implementaciju: $B=2$.
 \section{Implementacije i usporedbe}
+%TODO: ubaci primjere i za sve ostale, povijesne sqrt metode! Ima dosta toga u Knuth članku, Fowler...
 
 \printbibliography
 
