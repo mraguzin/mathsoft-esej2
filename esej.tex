@@ -19,6 +19,7 @@
 \MakeOuterQuote{"}
 \declaretheorem{teorem}
 \declaretheorem[style=definition,sibling=teorem,qed=$\vartriangleleft$]{definicija}
+\declaretheorem[name=Primjer,style=definition]{example}
 
 \newcommand{\T}{^\mathsf T}
 \newcommand{\mat}[1]{%
@@ -30,6 +31,16 @@
 }
 \newcommand{\vek}[1]{\mat{#1}}
 \newcommand{\citat}[2]{\begin{quotation}\textit{#1}\end{quotation}\begin{flushright}---#2\end{flushright}}
+\newcommand{\primjer}[2]{%
+    \renewcommand\qedsymbol{$\vartriangleleft$}%
+    \begin{example}%
+        #1%
+    \end{example}%
+    \begin{proof}[Rješenje]%
+        #2%
+    \end{proof}%
+    \renewcommand\qedsymbol{$\Square$}
+}
 
 \author{Mauro Raguzin}
 \title{Korijen --- 1 algoritam, 3 implementacije}
@@ -163,7 +174,7 @@ That term wasn't invented until years later. It is serendipity that the shortest
 \end{otherlanguage}}
 {Cleve Moler~\cite{spacewar}}
 
-U ovom odjeljku ćemo razmatrati neke novije pristupe računu korijena, pri čemu primarno mislimo na algoritme prilagođene
+U ovom odjeljku ćemo razmatrati neke novije pristupe računu korijena, pri čemu mislimo uglavnom na algoritme prilagođene
 izvršavanju na digitalnim računalima. Umjesto iscrpnog povijesnog pregleda svih varijanti implementiranih algoritama, usredotočit ćemo se na
 nekolicinu \textsl{sui generis} algoritama i njihovih implementacija, analizirajući
 njihova numerička svojstva i uspoređujući ih s onima iz odjeljka~\ref{sec:hist}.
@@ -192,15 +203,20 @@ Ako $c_k\to 0$ za $k\to\infty$, onda očito vrijedi $a_k\to y/x^{1/n}$ te iz \eq
 \begin{equation}
     c_{k+1} = (1+c_k)(1+\alpha c_k)^n - 1\text.
 \end{equation}
-Bitno je da osiguramo konvergenciju; indukcijom po $k$ je lako provjeriti da ako $y^2<x<1$ i npr.\ $\alpha=-1/2$, tada svi
-$c_k>0$ i taj niz monotono pada, što znači da konvergira ka $0$. Dualno, imamo da ako krenemo s negativnim brojem, niz ostaje negativan
-i konvergira ka $0$. Ipak, želimo postići \emph{što bržu} konvergenciju; za kvadratnu je dovoljno odabrati $\alpha=-1/n$~\cite{gower}.
+Bitno je da osiguramo konvergenciju; može se pokazati da ako $y^2<x<1$ (skalirano), za $|c_k|<1$ negativan imamo
+\begin{equation}\label{eq:edsacscale}
+    -1\leq c_{k+1}\leq(1+c_k)e^{-c_k}-1<0\text.
+\end{equation}
+Odabirom $\alpha=-1/n$ dobivamo kvadratnu konvergenciju ovog sustava~\cite{gower}.
 
 Uvrštavanjem u \eqref{eq:iter1} i \eqref{eq:iter2}, dobivamo:
 \begin{align}
     a_{k+1} &= a_k(1-c_k/n)\\
     c_{k+1} &= (1+c_k)(1-c_k/n)^n - 1\text.
 \end{align}
+Sada općenito vidimo da iz \eqref{eq:edsacscale} slijedi
+da su sve vrijednosti niza $c_k$ negativne te da taj niz konvergira ka $0$. Iz \eqref{eq:iter2} pak dobivamo
+$|a_k|^n<|y^n/x|$, iz čega možemo zaključiti da je $|a_k|<1$ (skalirano) čim je konačan rezultat isto takav.
 
 Za dobiti formule specifično za račun kvadratnog korijena od $x$, odabiremo $a_0=y=x$ i $c_0=x-1$ te $n=2$, što nam daje:
 \begin{equation}
@@ -209,13 +225,86 @@ Za dobiti formule specifično za račun kvadratnog korijena od $x$, odabiremo $a
         c_{k+1} &= \frac14 c^2_k(c_k-3)\text.
     \end{aligned}
 \end{equation}
+U ovom posebnom slučaju se konvergencija $a_k\to\sqrt x$ može lako provjeriti direktno po definiciji konvergencije
+niza koji je monotono padajući (unutar legalnog raspona $x$-a vrijedi da su sve $c_k$ vrijednosti negativne te rastu tj.
+apsolutna vrijednost niza pada) koristeći gornje rezultate o omeđenosti međurezultata; no, uočimo da to možemo pokazati
+samo za $0\leq x<3$ po gornjem odabiru početnih uvjeta --- to je jedini raspon unutar kojeg je ova metoda primjenjiva (što se tiče korijena).
+
+Ne samo da ova metoda ima relativno malu stvarnu domenu primjene, ona se također radi preciznosti često mora ograničiti još i više.
 Vidimo da je iteriranje sustava \eqref{eq:sqrtedsac} moguće korištenjem množenja, dijeljenja s potencijama od $2$ te zbrajanja i oduzimanja, što
 je lako za implementirati na svim procesorima. Ipak, ova metoda, zbog korištenja dvije iteracijske varijable, može akumulirati greške za razliku
 od starobabilonske metode. Konvergencija za račun korijena ovom metodom se usporava što je $x$ manji, što znači da bi trebali pred-skalirati argument
-što je više moguće (do gornje granice duljine riječi), obaviti račun i na kraju skalirati natrag. Faktor skaliranja treba biti parna potencija od $2$,
+što je više moguće (do gornje granice duljine riječi), obaviti račun i na kraju skalirati natrag; štoviše, nužno je
+skalirati argument tako da vrijedi $0<x<1$ (skalirano) radi osiguravanja da će konačan rezultat biti $<1$ (skalirano), čime dobivamo
+traženu garanciju strojne (u smislu fiksnog zareza) preciznosti. 
+Faktor skaliranja bi trebao biti parna potencija od $2$,
 kako bi račun korijena bez gubitka prepolovio eksponent.
 
-\subsection{Algoritam znamenka-po-znamenka}
+Iz svega navedenog možemo uočiti da je područje konvergencije ovog algoritma, pogotovo za nama najzanimljiviji slučaj $n=2$, izrazito usko
+(u tom slučaju vidimo da je riječ o podskupu od $\{x\mid x\in\left[0,3\right\rangle\}$ za kojeg jedino i možemo primijeniti ovaj algoritam), pa je
+zaista bitno primijeniti dosta pred- i post-procesiranja kako bi se izvuklo maksimalno preciznosti iz ovog algoritma.
+Gower u \cite{gower} preporučuje raspon ciljni $(\frac12)^n\leq x<1$.
+Za računala za koja je
+ovaj algoritam bio
+namijenjen, to je bila i jedina moguća relativno efikasna opcija.
+
+\subsection{Algoritam bit-po-bit}
+Sada ćemo proučiti jednu široko poznatu i implementiranu metodu za račun kvadratnog korijena, najčešće opet domene i kodomene u
+$\mathbb{N}$, iako se često koristi s odgovarajućim skaliranjem i za "realne" brojeve
+ na platformama gdje je moguća jedino aritmetika s fiksnim zarezom; mi ćemo podrazumijevati da radimo samo nad $\mathbb N$, pa ustvari
+ dajemo algoritam za račun $\lfloor\sqrt x\rfloor$.
+
+Riječ je o metodi kojom ljudi mogu dosta efikasno na papiru izračunati korijen, iako je sporija od svih prije obrađenih zbog toga
+što u svakoj iteraciji daje samo jednu novu znamenku rezultata. Ipak, popularna je i dandanas upravo zbog svoje jednostavnosti te je
+poznato da su neki rani ručni kalkulatori, poput Napierovih kosti (17.\ st.), koristili ovu metodu.
+ Opisat ćemo je primjerom
+u dekadskom brojevnom sustavu, a nakon toga formalizirati točan postupak za nama zanimljiv binarni sustav.
+
+\primjer{Izračunati $\sqrt{891}$.}
+{Kako smo u dekadskom sustavu, znamo da troznamenkasti brojevi mogu imati najviše dvoznamekasti korijen; općenito, $k$-znamenkasti broj
+može imati najviše $\lceil\\frac{k}{2}\rceil$-znamenkasti korijen. Mi u biti želimo "riješiti jednadžbu" $(10x+y)^2+z=891$, gdje je 
+"ostatak" $z$ potreban jer očekujemo da nam argument neće biti savršeni kvadrat. U tu svrhu krećemo od najznačajnije znamenke rješenja
+$x$ --- koja je najveća znamenka koja, kvadrirana i pomnožena sa $100$, daje broj manji ili jednak $891$? Nalazimo da je to $x=2$, pa
+uvrstimo to u jednadžbu i tražimo dalje $y$. Budući smo razriješili najznačajniji dio rezultata, možemo oduzeti dobiveni $400$ od $891$,
+dobiti $40y+y^2=419$
+i nastaviti pretragu kao prije. Tako nalazimo $y=8$ i, kako uvrštavanje u jednadžbu ne daje točno $419$,
+znamo da imamo "ostatak" $z>0$. No, nama on nije bitan, pa budući da ustvari računamo $\lfloor\sqrt{891}\rfloor$,
+ dovoljno je vratiti naš dobiveni rezultat kao konačno rješenje.}
+
+Općenito, ovaj algoritam se svodi na iterativno traženje najvećeg jednozamenkastog
+broja koji zadovoljava da mu je izračunata vrijednost preostalog dijela binomne jednadžbe manja ili jednaka (preostalom) argumentu, sve
+dok odredimo vrijednosti svih nepoznanica.
+
+Formalno, imamo zadan $N\in\mathbb N$ i tražimo znamenke $a_1,\dotsc a_n$ ($a_0$ je \emph{najznačajnija}; $a_i$-jevi 
+dakako uključuju i odgovarajuću potenciju baze $B$) tako da vrijedi 
+\begin{equation}
+    N=\left(\sum^n_{i=1}a_i\right)^2+z=N,
+\end{equation}
+gdje je $n=\lfloor \frac{\log_B N + 1}{2}\rfloor$.
+Iskoristimo multinomni teorem za dobiti raspis:
+\begin{equation}\label{eq:multiraspis}  %% TODO: pravilni stacking sume ispod!!
+    N=\sum^n_{i=1}a^2_i+2\sum^n_{i=0,\\i<j}\sum^n_{j=0}a_ia_j+z=N\text.
+\end{equation}
+Tražeći rekurzivnu strukturu u formuli \eqref{eq:multiraspis}, grupiramo sumande ovako:
+\begin{equation}
+    N=a^2_0+a_1(2a_0+a_1)+a_2(2a_0+2a_1+a_2)+\dotsb+a_n(2\sum^n_{i=1}a_i + a_n)\text.
+\end{equation}
+Sada možemo izraziti opisan iterativni račun pomoću rekurzivne relacije, za $k\geq 1$:
+%\begin{equation}
+    \begin{align}
+    Y_k&=(2P_{k-1} + a_k)a_k
+    \shortintertext{gdje je}
+    P_k&=\sum^k_{i=1}a_i\text.
+    \end{align}
+%\end{equation}
+Uz $Y_{-1}=0$ i $Y_0:=a_0^2$, vidimo da vrijedi $N=\sum^n_{i=0} Y_i$, stoga je moguće progresivno aproksimirati korijen od $N$ traženjem redom takvih
+$a_0,a_1,\dotsc$ da vrijedi $Y_k\geq Y_{k-1}$ i $S_k:=\sum^k_{i=0} Y_i\leq N$. Ako na početku bilo koje iteracije $k$ detektiramo da vrijedi
+$S_k=0$, tada znamo da smo gotovi ranije od maksimalnog mogućeg broja iteracija, koji je jednak poziciji najznačajnije (ne-nula) znamenke broja $N$
+(no u praksi se ovaj algoritam izvodi na računalima gdje ćemo, zbog fiksnih i relativno malih širina registara, uvijek kretati od najviše bit-pozicije).
+
+Ovo je sasvim generički opis, neovisan o bazi $B$, no mnoge zanimljive i specifične
+ optimizacije su moguće upravo u slučaju koji nas zanima za računalnu implementaciju: $B=2$.
+\section{Implementacije i usporedbe}
 
 \printbibliography
 
