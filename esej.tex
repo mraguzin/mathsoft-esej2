@@ -305,7 +305,7 @@ poziva koliki je $N$, sve do dolaska do baznog slučaja za $1$, uz još dodatnu 
 "brža" indukcija.
 
 Tvrdimo da je moguće doći do istog rezultata koristeći, umjesto opetovanog dekrementiranja argumenta u koraku, njegovo dijeljenje s $4$
-tj.\ bitovni posmak za $2$ udesno, što dovodi do vremenske složenosti $O(\lg\lg N)$ u usporedbi s prethodnom $O(\lg N)$. Osnovna ideja je
+tj.\ bitovni posmak za $2$ udesno, što dovodi do vremenske složenosti $O(\lg\lg N)$\footnote{\log_2 =\lg x} u usporedbi s prethodnom $O(\lg N)$. Osnovna ideja je
 da mi na temelju izračunatog korijena od $\lfloor\frac{N}{4}\rfloor$ možemo dobiti korijen od $N$, što opravdava korištenje potpune
 indukcije na $N$ u svrhu dokaza ovog korisnijeg rezultata. Za provesti tu indukciju, moramo prvo navesti neke elementarne rezultate
 na koje ćemo se pozvati (u donjim iskazima pretpostavljamo da $\mathbb{N}$ uključuje $0$).
@@ -416,7 +416,7 @@ od točno najvišeg ne-nula bita od $N$\footnote{U praksi se ovaj algoritam izvo
 i relativno malih širina registara, uvijek kretati od najviše bitovne pozicije (ovo ima smisla do oko $32$ bita).
 Naravno da onda postoje i varijante u kojima se pokušava na razne načine
 zaobići potreba prolaska od najvišeg bita uz obavljanje cijelog računa svaki put, što može dovesti do ubrzanja, ali samo uz povećanje
-prostorne složenosti jer nam tada treba barem nekakva konstantna tablica vrijednosti u memoriji.
+memorijskih zahtjeva jer nam tada treba barem nekakva konstantna tablica vrijednosti u memoriji.
 Jedan takav algoritam, zasnovan na tablici i malom broju računskih operacija,
 bit će obrađen zadnji.}, što bi zahtijevalo i inicijalno izračunavanje indeksa te pozicije, mi jednostavno možemo krenuti od najvišeg bita registra.
 Preciznije, budući da znamo da ćemo u koraku dijeliti s $4$ tj.\ posmaknuti sve bitove za $2$ mjesta udesno (u niskorazinskim implementacijama), dovoljno
@@ -424,23 +424,29 @@ je započeti na najznačajnijoj grupi od dva bita, s tim da mi pamtimo \emph{ni�
 kraja algoritma: kada je ostatak bitova iz $jedinica$ kompletno u $0$, više nema potrebe ništa računati i prekidamo algoritam.
 
 Dualno, ne zanimaju nas ni najviši $0$-bitovi iz $N$ jer oni ne mogu doprinijeti korijenu, pa se pomičemo po dva bita udesno dok ne "udarimo" u neki 
-par ne-nula bitova iz $N$. U tom trenutku dakle, nakon završetka prve \textsl{while} petlje,
+par ne-nula bitova iz $N$, pri čemu je $n$ indeks najviše bit-pozicije u $N$. U tom trenutku dakle, nakon završetka prve \textsl{while} petlje,
 znamo par indeksa među kojima je indeks pozicije najvišeg bita u $N$. Sada idemo, unutar iduće petlje, obaviti sve korake dok ne iscrpimo
-sve relevantne parove bitova. Ovdje je ključna optimizacija držanje trenutne (reducirane) verzije argumenta $N$ u varijabli $op$ jer nam omogućuje
-da, u slučaju da vrijedi $N \ge (2r+1)^2$ u algoritmu \ref{alg:isqrt1} na nekoj razini poziva, lako korigiramo rezultat. Trik je u tome da sada
-\emph{uopće ne kvadriramo} unutar te provjere, jer uočavamo da je proširen izraz $(2r+1)^2=4r^2+4r+1$ uvijek s postavljenim najnižim bitom, a kako
-mi napredujemo kroz korake upravo dijeljenjem $jedinice$ s $4$ (preostali faktori u izrazu su umnošci od $4$), znamo da smo
-do ovog koraka petlje u $rezultat$ već smjestili sve niže bitove rješenja. Zato test $op\geq rezultat+jedinica$ ispravno testira je li se dogodio
-odgovarajući preljev. Preostaje još "popraviti" varijable: $op$ se mora umanjiti za $rezultat+jedinica$ jer je 
-"bit viška" već doprinio rezultatu; ukoliko viška nema, $op$ se ne mijenja jer nije mogao biti postavljen ni jedan novi bit rezultata.
-Važno je da se u liniji \ref{line:rezupd} $rezultat$ uveća za $2\cdot jedinica$, jer mi pamtimo jedinicu na nižoj poziciji para, a trebamo
-postaviti bit na višoj poziciji. Na samom kraju petlje jednostavno posmičemo bitove u odgovarajućim varijablama, gdje je bitno da se $rezultat$
-pomiče samo za jedno mjesto udesno jer mi u svakom koraku dobivamo točno jedan novi bit rezultata ($0$ ako nema preljeva), iz čega proizlazi ime
-ove sekcije odnosno algoritma.
+sve relevantne parove bitova. Treba objasniti točno što druga petlja radi, jer nije inicijalno očito da ima ikakve veze s algoritmom \ref{alg:isqrt1},
+iako vidimo da se korektno pomičemo po dva bita udesno. Kao prvo, stavimo $N=x^2+r$, gdje $x^2\leq N < (x+1)^2$ i $r$ je "ostatak".
+Mi dakle tražimo bitove $x=a_0,\dotsc ,a_n,\,a_i\in\{2^i,0\}$. To radimo tako da održavamo aproksimaciju $x$-a $P_m=a_n+a_{n-1}+\dotsb+a_m$.
+Kako napredujemo od \emph{viših} bit-pozicija prema nižim, imamo $P_m=P_{m+1}+a_m$, gdje moramo odlučiti je li $a_m=0$ ili je $a_m=2^m$.
+To očito možemo na temelju nejednakosti $(P_{m+1}+2^m)^2 \leq N$ --- ako je ona istinita, $a_m=2^m$, a inače $a_m=0$. Ovo bi bilo dovoljno za
+osnovni iterativni algoritam, ali tada bismo morali u svakom koraku kvadrirati dosadašnju aproksimaciju, što nije nužno ako iskoristimo činjenicu
+da su znamenke u bazi $2$ invarijantne na kvadriranje i da kvadrat aproksimacije možemo lako ažurirati: želimo dobiti $N-P^2_{m-1}$ na temelju
+$N-P^2_m$. Ako stavimo $N-P^2_{m-1}+z=N-P^2_m$, moramo odrediti $z$. Raspisujemo
+\begin{align}
+    x&=P^2_{m-1}-P^2_m\\
+    &=(a_n+\dotsb+a_m+a_{m-1})^2+(a_n+\dotsb+a_m)^2\\
+    &=2(a_n+\dotsb+a_m)a_{m-1}+a^2_{m-1}=2P_ma_{m-1}+a^2_{m-1}\text.
+\end{align}
+Dakle, kada trebamo odabrati $2^m$ ili $0$ za $a_m$, oduzmemo $2P_{m+1}2^m+2^{2m}$ od zadnje zapamćene razlike $N-P^2_{m+1}$ i provjerimo je li rezultat
+veći ili jednak od $0$. Želeći izbjeći množenje (i kvadriranje), 
 
-Iako se čini da ovaj algoritam ne napreduje suviše brzo, njegova je glavna prednost to što ima fiksan broj iteracija petlje
+Iako se čini da ovaj algoritam ne napreduje suviše brzo (ne pogađa inicijalnu aproksimaciju koju zatim profinjuje), njegova je
+glavna prednost to što ima fiksan broj iteracija petlje
 (ovisan samo o duljini registara ciljne arhitekture) i stoga relativno lako odredivo ukupno
-vrijeme izvršavanja na jednostavnijim, danas uglavnom ugradbenim arhitekturama.
+vrijeme izvršavanja na jednostavnijim, danas uglavnom ugradbenim arhitekturama. Idući algoritam može postići bolje performanse na većini
+modernih strojeva koristeći "informiraniju" progresivnu aproksimaciju.
 
 \subsection{CPython-ov algoritam}
 \citat{The integer square root is a common number-theoretic primitive, useful for example in primality testing.
@@ -452,7 +458,7 @@ algoritma \ref{alg:isqrt2} za račun cjelobrojnog kvadratnog korijena~\cite{Cpyt
 koji umjesto posmaka za fiksni broj mjesta koristi varijabilni posmak $s$ koji se smanjuje kako algoritam napreduje. Iteracije se baziraju
 na Newtonovoj metodi i koristi se puno brža metoda u posebnom slučaju kada je argument manji od $2^{64}$; naime, Python interno podržava
 cjelobrojnu aritmetiku proizvoljne preciznosti, no raditi račun u proizvoljno visokoj preciznosti kada bi se mogao izvesti i u puno manjoj
-(idealno nativno hardverskoj) je rastrošno, pa algoritam ustvari adaptivno povećava preciznost računa. Također postoji posebna, vrlo kratka
+(idealno strojnoj) je rastrošno, pa algoritam ustvari adaptivno povećava preciznost računa. Također postoji posebna, vrlo kratka
 i efikasna varijanta koja se sastoji samo od najosnovnijih aritmetičkih operacija i ne sadrži grananja.
 U samom Pythonu, ova funkcija je dostupna kao \texttt{math.isqrt} od
 verzije 3.8.
