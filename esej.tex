@@ -45,6 +45,16 @@
     \renewcommand\qedsymbol{$\square$}
 }
 
+\newcommand{\algoritam}[2]{%
+\begin{algorithm}
+\floatname{algorithm}{Algoritam}
+\caption{#1}
+\begin{algorithmic}
+#2
+\end{algorithmic}
+\end{algorithn}
+}
+
 \author{Mauro Raguzin}
 \title{Korijen --- 1 algoritam, 3 implementacije}
 \date{\today}
@@ -282,6 +292,7 @@ i nastaviti pretragu kao prije. Tako nalazimo $y=8$ i, kako uvrštavanje u jedna
 znamo da imamo "ostatak" $z>0$. No, nama on nije bitan budući da ustvari računamo $\lfloor\sqrt{819}\rfloor$, pa je
  dovoljno vratiti naš dobiveni rezultat kao konačno rješenje.}
 
+\subsubsection{Općenit pseudokod}
 Općenito, ovaj algoritam se svodi na iterativno traženje najvećeg jednozamenkastog
 broja koji zadovoljava da mu je izračunata vrijednost preostalog dijela multinomne jednadžbe manja ili jednaka (preostalom) argumentu, sve
 dok ne odredimo vrijednosti svih nepoznanica.
@@ -356,14 +367,15 @@ odgovara bitovnom posmaku za 2 udesno i stoga se lako vizualizira i izvodi u ra�
 U tom slučaju računamo u bazi $10$ i, umjesto $4$, za djelitelja odabiremo $100$ kao prvi savršeni kvadrat te baze i svi ostali rezultati slijede
 na analogan način. Pseudokod generičkog algoritma za bazu $B$ glasi:
 \begin{algorithm}
-    \caption{Algoritam $\mathsf{isqrt}$ za cjelobrojni kvadratni korijen od $N$}\label{alg:isqrt1}
+    \floatname{algorithm}{Algoritam}
+    \caption{Algoritam $\mathsf{isqrt}$ za cjelobrojni kvadratni korijen od $N$ u bazi $B$}\label{alg:isqrt1}
     \begin{algorithmic}
     \Require $N \geq 0$
     \If{$N = 0$}
         \State $rezultat \gets 0$
     \Else
-        \State $z \gets \left\lfloor\dfrac{N}{4}\right\rfloor$
-        \State $r_2 \gets 2 \cdot \mathsf{isqrt}(z)$
+        \State $z \gets \left\lfloor\dfrac{N}{B^2}\right\rfloor$
+        \State $r_2 \gets B \cdot \mathsf{isqrt}(z)$
         \State $r_3 \gets r_2 + 1$
         \If{$N < r_3^2$}
             \State $rezultat \gets r_2$
@@ -371,24 +383,87 @@ na analogan način. Pseudokod generičkog algoritma za bazu $B$ glasi:
             \State $rezultat \gets r_3$
         \EndIf
     \EndIf
-    \State $rezultat \gets \mathsf{isqrt}(N)$
     \end{algorithmic}
 \end{algorithm}
 
 Jasno, ovo je čisto rekurzivna implementacija teorema \eqref{tm:isqrt1} dokazanog indukcijom za koju ne očekujemo jako dobre performanse upravo zbog
-uporabe rekurzije. Usredotočimo se na slučaj za $B=2$ i kao prvu "optimizaciju", prevedimo algoritam \ref{alg:isqrt1} u iterativni pseudokod:
+uporabe rekurzije. Usredotočimo se na slučaj za $B=2$ i prevedimo algoritam \ref{alg:isqrt1} u iterativni pseudokod uz nekoliko optimizacija:
+\begin{algorithm}
+    \floatname{algorithm}{Algoritam}
+    \caption{Algoritam $\mathsf{isqrt}$ za $B=2$, iterativna varijanta za $32$-bitnu arhitekturu~\cite{guysqrt}}\label{alg:isqrt2}
+    \begin{algorithmic}[1]
+    \Require $N \geq 0$
+    \State $op \gets N$
+    \State $rezultat \gets 0$
+    \State $jedinica \gets 2^{30}$
+    \While{$jedinica > op$}
+        \State $jedinica \gets \left\lfloor\frac{jedinica}{4}\right\rfloor$
+    \EndWhile
 
-$N$\footnote{U praksi se ovaj algoritam izvodi na računalima gdje ćemo, zbog fiksnih
+    \While{$jedinica\neq 0$}
+        \If{$op \geq rezultat + jedinica$}
+            \State $op \gets op - (rezultat + jedinica)$
+            \State $rezultat \gets rezultat + 2 \cdot jedinica$\label{line:rezupd}
+        \EndIf
+        \State $rezultat \gets \left\lfloor\frac{rezultat}{2}\right\rfloor$
+        \State $jedinica \gets \left\lfloor\frac{jedinica}{4}\right\rfloor$
+    \EndWhile
+    \end{algorithmic}
+\end{algorithm}
+
+Objasnimo pobliže što se dogodilo u transformaciji iz algoritma \ref{alg:isqrt1} u algoritam \ref{alg:isqrt2}. Prva očita stvar je da, umjesto kretanja
+od točno najvišeg ne-nula bita od $N$\footnote{U praksi se ovaj algoritam izvodi na računalima gdje ćemo, zbog fiksnih
 i relativno malih širina registara, uvijek kretati od najviše bitovne pozicije (ovo ima smisla do oko $32$ bita).
 Naravno da onda postoje i varijante u kojima se pokušava na razne načine
 zaobići potreba prolaska od najvišeg bita uz obavljanje cijelog računa svaki put, što može dovesti do ubrzanja, ali samo uz povećanje
 prostorne složenosti jer nam tada treba barem nekakva konstantna tablica vrijednosti u memoriji.
 Jedan takav algoritam, zasnovan na tablici i malom broju računskih operacija,
-bit će obrađen zadnji.}.
+bit će obrađen zadnji.}, što bi zahtijevalo i inicijalno izračunavanje indeksa te pozicije, mi jednostavno možemo krenuti od najvišeg bita registra.
+Preciznije, budući da znamo da ćemo u koraku dijeliti s $4$ tj.\ posmaknuti sve bitove za $2$ mjesta udesno (u niskorazinskim implementacijama), dovoljno
+je započeti na najznačajnijoj grupi od dva bita, s tim da mi pamtimo \emph{niži} indeks i postavljamo jedinicu tamo.  To nam omogućuje laganu provjeru
+kraja algoritma: kada je ostatak bitova iz $jedinica$ kompletno u $0$, više nema potrebe ništa računati i prekidamo algoritam.
 
-Ovo je bio sasvim generički opis, neovisan o bazi $B$, no mnoge zanimljive i specifične
- optimizacije su moguće upravo u slučaju koji nas zanima za računalnu implementaciju: $B=2$. Naime, uočimo kako bi u slučaju $B=10$ bilo potrebno,
- po gornjem opisu algoritma, kvadrirati 
+Dualno, ne zanimaju nas ni najviši $0$-bitovi iz $N$ jer oni ne mogu doprinijeti korijenu, pa se pomičemo po dva bita udesno dok ne "udarimo" u neki 
+par ne-nula bitova iz $N$. U tom trenutku dakle, nakon završetka prve \textsl{while} petlje,
+znamo par indeksa među kojima je indeks pozicije najvišeg bita u $N$. Sada idemo, unutar iduće petlje, obaviti sve korake dok ne iscrpimo
+sve relevantne parove bitova. Ovdje je ključna optimizacija držanje trenutne (reducirane) verzije argumenta $N$ u varijabli $op$ jer nam omogućuje
+da, u slučaju da vrijedi $N \ge (2r+1)^2$ u algoritmu \ref{alg:isqrt1} na nekoj razini poziva, lako korigiramo rezultat. Trik je u tome da sada
+\emph{uopće ne kvadriramo} unutar te provjere, jer uočavamo da je proširen izraz $(2r+1)^2=4r^2+4r+1$ uvijek s postavljenim najnižim bitom, a kako
+mi napredujemo kroz korake upravo dijeljenjem $jedinice$ s $4$ (preostali faktori u izrazu su umnošci od $4$), znamo da smo
+do ovog koraka petlje u $rezultat$ već smjestili sve niže bitove rješenja. Zato test $op\geq rezultat+jedinica$ ispravno testira je li se dogodio
+odgovarajući preljev. Preostaje još "popraviti" varijable: $op$ se mora umanjiti za $rezultat+jedinica$ jer je 
+"bit viška" već doprinio rezultatu; ukoliko viška nema, $op$ se ne mijenja jer nije mogao biti postavljen ni jedan novi bit rezultata.
+Važno je da se u liniji \ref{line:rezupd} $rezultat$ uveća za $2\cdot jedinica$, jer mi pamtimo jedinicu na nižoj poziciji para, a trebamo
+postaviti bit na višoj poziciji. Na samom kraju petlje jednostavno posmičemo bitove u odgovarajućim varijablama, gdje je bitno da se $rezultat$
+pomiče samo za jedno mjesto udesno jer mi u svakom koraku dobivamo točno jedan novi bit rezultata ($0$ ako nema preljeva), iz čega proizlazi ime
+ove sekcije odnosno algoritma.
+
+Iako se čini da ovaj algoritam ne napreduje suviše brzo, njegova je glavna prednost to što ima fiksan broj iteracija petlje
+(ovisan samo o duljini registara ciljne arhitekture) i stoga relativno lako odredivo ukupno
+vrijeme izvršavanja na jednostavnijim, danas uglavnom ugradbenim arhitekturama.
+
+\subsection{CPython-ov algoritam}
+\citat{The integer square root is a common number-theoretic primitive, useful for example in primality testing.
+This is something I've had to code up myself multiple times, and is also something that's quite easy to get wrong,
+or implement in a way that's inefficient for large inputs~\cite{mdickisqrt}.}{Mark Dickinson}
+
+Trenutna verzija CPythona --- referentne implementacije virtualnog stroja za programski jezik Python --- koristi zanimljivu varijantu 
+algoritma \ref{alg:isqrt2} za račun cjelobrojnog kvadratnog korijena~\cite{Cpythonisqrt}. Naime, radi se o \emph{adaptivnom} algoritmu
+koji umjesto posmaka za fiksni broj mjesta koristi varijabilni posmak $s$ koji se smanjuje kako algoritam napreduje. Iteracije se baziraju
+na Newtonovoj metodi i koristi se puno brža metoda u posebnom slučaju kada je argument manji od $2^{64}$; naime, Python interno podržava
+cjelobrojnu aritmetiku proizvoljne preciznosti, no raditi račun u proizvoljno visokoj preciznosti kada bi se mogao izvesti i u puno manjoj
+(idealno nativno hardverskoj) je rastrošno, pa algoritam ustvari adaptivno povećava preciznost računa. Također postoji posebna, vrlo kratka
+i efikasna varijanta koja se sastoji samo od najosnovnijih aritmetičkih operacija i ne sadrži grananja.
+U samom Pythonu, ova funkcija je dostupna kao \texttt{math.isqrt} od
+verzije 3.8.
+
+TODO: kratka skica dokaza iz komentara cpythona?
+
+
+
+
+
+\subsection{Korijen iz recipročnog korijena}
 \section{Implementacije i usporedbe}
 %TODO: ubaci primjere i za sve ostale, povijesne sqrt metode! Ima dosta toga u Knuth članku, Fowler...
 
