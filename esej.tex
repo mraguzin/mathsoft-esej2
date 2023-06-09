@@ -251,13 +251,6 @@ pod uvjetom da nam je realna računalna aritmetika dovoljno precizna ili da radi
 Za usporedbu, poznata Newton-Raphsonova iteracijska shema konvergira kvadratno.}! Nijedan algoritam
 slične efikasnosti nije bio poznat u Europi sve do 18.\ stoljeća.
 
-% \begin{teorem}
-%     Bakhshali algoritam za račun kvadratnog korijena kvartično konvergira.
-% \end{teorem}
-% \begin{proof}
-    
-% \end{proof}
-
 \section{Moderniji pristupi}
 \citat{\begin{otherlanguage}{english}
     Steve Russell certainly didn't know that his Spacewar was using a symplectic integrator.
@@ -552,7 +545,9 @@ Sada vidimo da u \eqref{eq:optim3} možemo optimalno ažurirati $rezultat$ bez p
     \end{cases}
 \end{equation}
 Očito, sada je moguće izračunati $\Delta$ vrijednost ažuriranja kao $jedinica+rezultat$ u svakoj iteraciji te će na kraju $rezultat$ ujedno i
-predstavljati konačnu (najbolju cjelobrojnu) aproksimaciju korijena $x$.
+predstavljati konačnu (najbolju cjelobrojnu) aproksimaciju korijena $x$. Napomenimo da bi sve operacije koje uključuju množenje ili dijeljenje s
+potencijom od $2$ trebale biti zamijenjene odgovarajućim bitovnim posmakom u stvarnim implementacijama.%\footnote{To je temelj učinkovitosti
+%ovog algoritma; uočimo također da je moguće umjesto pribrajanja u )
 
 Iako se čini da ovaj algoritam ne napreduje suviše brzo (ne pogađa inicijalnu aproksimaciju koju zatim profinjuje), njegova je
 glavna prednost to što ima fiksan broj iteracija petlje
@@ -560,7 +555,8 @@ glavna prednost to što ima fiksan broj iteracija petlje
 vrijeme izvršavanja na jednostavnijim, danas uglavnom ugradbenim arhitekturama. Idući algoritam može postići bolje performanse na većini
 modernih strojeva koristeći "informiraniju" progresivnu aproksimaciju.
 
-\subsection{CPython-ov algoritam}
+%\subsection{CPython-ov algoritam}
+\subsection{Algoritmi s adaptivnom preciznosti}
 \citat{The integer square root is a common number-theoretic primitive, useful for example in primality testing.
 This is something I've had to code up myself multiple times, and is also something that's quite easy to get wrong,
 or implement in a way that's inefficient for large inputs~\cite{mdickisqrt}.}{Mark Dickinson}
@@ -572,13 +568,97 @@ na Newtonovoj-Raphsonovoj metodi i koristi se puno brža metoda u posebnom sluč
 cjelobrojnu aritmetiku proizvoljne preciznosti, no raditi račun u proizvoljno visokoj preciznosti kada bi se mogao izvesti i u puno manjoj
 (idealno strojnoj) je rastrošno, pa algoritam ustvari adaptivno povećava preciznost računa. Također postoji posebna, vrlo kratka
 i efikasna varijanta koja se sastoji samo od najosnovnijih aritmetičkih operacija i ne sadrži grananja.
-U samom Pythonu, ova funkcija je dostupna kao \texttt{math.isqrt} od
-verzije 3.8.
+U samom Pythonu, ova funkcija je dostupna kao \texttt{math.isqrt} od verzije 3.8.
 
+CPython-ov algoritam se temelji na sličnoj ideji kao prethodni bit-po-bit algoritam, samo što sada ne želimo koristiti fiksni djelitelj
+za dobivanje manjeg korijena iz kojeg se onda izvlači željeni korijen, već želimo u svakoj iteraciji izračunati aproksimaciju od
+$\lfloor N/4^f\rfloor$ za neki pozitivni $f$ koji opada kako iteracije napreduju te je na kraju $0$. Također, dopuštamo da se konačan
+rezultat računa progresivnim aproksimacijama u svakoj iteraciji, gdje je akumulacija greške kontrolirana i dokazivo omogućuje izbavljanje
+točnog rezultata na samom kraju. Ovaj algoritam 
+koristi te ideje kombinirane s osnovnom Heronovom metodom da izračuna tzv.\ skoro-korijen od $N$, po definiciji iz \cite{mdickpaper}:
+\begin{definicija}
+    Neka je $N\in\mathbb N$. Kažemo da je $a\in\mathbb N$ \emph{skoro-korijen} od $n$ ako vrijedi 
+    \begin{equation*}
+        (a-1)^2 < n < (a+1)^2\text.
+    \end{equation*}
+\end{definicija}
+Očito nije problem dobiti cjelobrojni korijen iz skoro-korijena. Idući teorem govori, slično kao \ref{tm:isqrt1} za neadaptivni slučaj,
+kako dobiti skoro-korijen iz skoro-korijena određenog kvocijenta.
+\begin{teorem}
+    Neka su $N,k\in\mathbb N$ i $4k^4 \leq N$. Neka je $b$ skoro-korijen od $\lfloor n/4k^4\rfloor$. Tada je 
+    \begin{equation}
+        a=kb+\left\lfloor\frac{N}{4kb}\right\rfloor
+    \end{equation}
+    skoro-korijen od $N$.
+\end{teorem}
+\begin{proof}
+    Po definiciji skoro-korijena imamo
+    \begin{equation}
+        (b-1)^2 < \left\lfloor\frac{N}{4k^2}\right\rfloor < (b+1)^2\text.
+    \end{equation}
+    Kako je $(b+1)^2$ cijeli broj, vrijedi
+    \begin{equation}\label{eq:py1}
+        (b-1)^2 < \frac{N}{4k^2} < (b+1)^2\text.
+    \end{equation}
+    Množenjem \eqref{eq:py1} sa $4k^2$ i uzimanjem korijena dobivamo
+    \begin{equation}
+        2k(b-1) < \sqrt{N} < 2k(b+1)
+    \end{equation}
+    iz čega slijedi
+    \begin{equation}\label{eq:py2}
+        |2kb - \sqrt{N}| < 2k\text.
+    \end{equation}
+    Kvadriranjem i dijeljenjem \eqref{eq:py2} s $4kb$ dobivamo
+    \begin{equation}\label{eq:py3}
+        0 \leq kb + \frac{N}{4kb} - \sqrt{N} < k/b,
+    \end{equation}
+    što povlači
+    \begin{equation}
+        -1 < kb + \left\lfloor\frac{N}{4kb}\right\rfloor - \sqrt{N} < k/b\text.
+    \end{equation}
+    Po definiciji od $a$ iz \eqref{eq:py3} dobivamo 
+    \begin{equation}\label{eq:py4}
+        -1 < a - \sqrt{N} < k/b\text.
+    \end{equation}
+    
+    Još nam treba činjenica da $k/b\leq1$. Nju možemo dobiti kombiniranjem pretpostavke da je $4k^4 \leq N$ i desne strane iz \eqref{eq:py1},
+    čime dobivamo $k^2 < (b+1)^2\implies k < b+1\implies k\leq b\implies k/b\leq 1$. Konačno, iz \eqref{eq:py4} sada slijedi
+    \begin{equation}
+        -1 < a - \sqrt{N} < 1\text.
+    \end{equation}
+\end{proof}
 
+Slijedi pseudokod rekurzivne verzije algoritma kojeg CPython koristi, iako je u implementaciji korištena \emph{iterativna} varijanta koju nećemo
+dalje analizirati.
+\begin{algorithm}\label{alg:nsqrt}
+    \floatname{algorithm}{Algoritam}
+    \caption{$\mathsf{nsqrt}$ algoritam za račun skoro-korijena (rekurzivna verzija)~\cite{mdickpaper}}\label{alg:nsqrt}
+    \begin{algorithmic}[1]
+    \Require $N \geq 0$
+    \If{$n < 4$}
+        \State $rezultat \gets 1$
+    \Else
+        \State $e \gets \lfloor(M.bitova - 3) / 4\rfloor$
+        \State $b \gets nsqrt(\lfloor N / 2^{2e+2}\rfloor)$
+        \State $rezultat \gets \lfloor(b \cdot 2^e) + (\lfloor N / 2^e\rfloor + 2) / b\rfloor$
+    \EndIf
+    \end{algorithmic}
+\end{algorithm}
+Kada dobijemo skoro-korijen ovim algoritmom, a želimo cjelobrojni korijen, samo provjerimo je li kvadrat rezultata veći od argumenta ili ne;
+ako je, moramo ga umanjiti za $1$ za dobiti cjelobrojni korijen.
+U algoritmu \ref{alg:nsqrt} je odabran $k=2^e$ za $e=\lfloor(N.bitova - 3) / 4\rfloor$ kako bi se sva množenja i dijeljenja mogla svesti
+na bitovne posmake i kako bi broj iteracija bio što manji. Drugim riječima, pronađen je najveći $k$ koji je potencija od $2$ i koji
+zadovoljava $4k^4 \leq n$. $rezultat$ se dobiva sumiranjem $kb$ sa $\left\lfloor\dfrac{N}{4kb}\right\rfloor$, što sada odgovara rezultatu
+$\mathsf{nsqrt}$ poziva $b$ posmaknutim ulijevo za $e$ mjesta, jer je $k=2^e$, odnosno $n$ posmaknutom udesno za $e+2$, što odgovara
+dijeljenju $4k$, nakon čega dolazi dijeljenje s  $b$.
 
-
-
+CPython također sadrži posebne slučajeve ovog algoritma za "manje" argumente tj.\ najčešće korištene brojeve koji su direktno hardverski
+podržani (bez potrebe korištenja aritmetike proizvoljne preciznosti). U tim slučajevima možemo jednostavno "razmotati" algoritam \ref{alg:nsqrt} fiksni
+broj puta (za kojeg se zna da se uvijek dobiva točan rezultat za npr.\ $32$ ili $64$ bita) i zapisati ga kao konstantan niz naredbi. Vidimo da je to onda,
+barem što se tiče prosječnog slučaja i apsolutne prostorne složenosti, najefikasniji algoritam za cjelobrojni korijen kada radimo s hardverskim
+cijelim brojevima\footnote{Postoji još efikasnija varijacija u terminima ukupnog \emph{broja} (ne i pojedine složenosti!) instrukcija, koja korištenjem jednog
+množenja i jednog
+dijeljenja uz pomoćnu tablicu može postići impresivne performanse na nekim arhitekturama; k\^od je u~\cite{mdickpaper}.}.
 
 
 \subsection{Korijen iz recipročnog korijena}
