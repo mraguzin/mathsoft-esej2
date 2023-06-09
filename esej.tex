@@ -76,7 +76,19 @@ U ovom eseju obrađujemo u detalje ovaj algoritam kroz povijest, od nekoliko sto
 do današnjeg kompjutoriziranog doba u kojem su precizne i vrlo efikasne varijante
 ovog algoritma od presudne važnosti u raznolikim poljima primjene, poput simulacije, digitalne fizike i računalne grafike. Usput ćemo predstaviti
 i neke analize posebno zanimljivih modernih računalnih implementacija te predstaviti mjerenja obavljena na današnjim računalima za različite implementacije.
-% TODO: zašto baš tri implementacije? Navedi tu ukratko razlog + koliko smo ih ustvari točno obradili!
+
+Pogledat ćemo dvije bitno različite klase algoritama za račun korijena: one namijenjene dobivanju \emph{cjelobrojnog} korijena i općenite
+metode koje daju realan broj (u nekoj reprezentaciji s pomičnim zarezom). Iako je moguće dobiti određenu vrstu povećane preciznosti
+cjelobrojnih algoritama korištenjem brojeva s fiksnim zarezom, takvi algoritmi nisu primjenjivi na jako velikom rasponu brojeva jer uvijek moramo
+fiksno odvojiti cijeli i ne-cijeli dio. Zato se na kraju se bavimo specifično algoritmom koji je namijenjen računu u realnim
+brojevima i samim time mora koristiti reprezentaciju realnih brojeva pomoću \emph{pomičnog} zareza, dostupnu u većini današnjih računala.
+Sljedeća definicija će biti od koristi kroz cijeli rad:
+\begin{definicija}
+    Neka je $N\in\mathbb{N}$. Kažemo da je $x$ cjelobrojni (kvadratni) korijen od $N$ ako vrijedi
+    \begin{equation*}
+        x^2 \leq N < (x+1)^2\text.
+    \end{equation*}
+\end{definicija}
 
 \section{Povijest računa kvadratnog korijena}\label{sec:hist}
     \citat{\begin{otherlanguage}{english}
@@ -128,7 +140,7 @@ uzimanjem dobivene ($\frac{17}{12}$ u \eqref{eq:babiter}) bolje aproksimacije um
 ($\frac32$) za nastavak računa, no zapisi s takvim postupcima nisu pronađeni,
 vjerojatno zbog toga što se rijetko kada dobije "regularan" međurezultat te zbog toga što
 bi potreban račun bio suviše složen, uključujući množenja za koja nisu postojali podaci u dostupnim tablicama za množenje. Stoga se čini da su 
-Babilonjani bili uglavnom zadovoljni rezultatom jedne jedine iteracije ove osnovne metode, koja je u biti ekvivalentna mnogo kasnije zabilježenom Herodovom
+Babilonjani bili uglavnom zadovoljni rezultatom jedne jedine iteracije ove osnovne metode, koja je u biti ekvivalentna mnogo kasnije zabilježenom Heronovom
 metodom za račun korijena, potrebnom za evaluaciju poznate Heronove formule za površinu trokuta
 \begin{equation*}
     P_{\triangle} = \sqrt{s(s-a)(s-b)(s-c)}\text.
@@ -141,6 +153,72 @@ Dakle, račun korijena od $N$ se u oba slučaja svodi na rješavanje rekurzivne 
     a_{n+1}=\frac12\left(a_n+\frac{N}{a_n}\right),
 \end{equation}
 s prikladnom početnom aproksimacijom $a_0$.
+
+Dokažimo za kraj ovog dijela da Heronova metoda daje točan rezultat u domeni $\mathbb N$ pri računu $\lfloor\sqrt{N}\rfloor$.
+ Definirajmo funkciju $g$ na $\mathbb N$ kao
+\begin{equation}
+    g(a) = \left\lfloor\frac{a+\lfloor N/a\rfloor}{2}\right\rfloor\text.
+\end{equation}
+
+U svrhu dokaza glavnog rezultata dokazujemo sljedeće četiri leme~\cite{mdickpaper}:
+\begin{lema}\label{lm:heron1}
+    Za svaki $a\in\mathbb N$ vrijedi $\lfloor\sqrt{N}\rfloor \leq g(a)$.
+\end{lema}
+\begin{proof}
+    Iz $0\leq(a-\sqrt{N})^2$ lako slijedi
+    \begin{align*}
+        2a\sqrt{N} &\leq a^2 + N\Bigr/\cdot\frac12 \\
+        \sqrt{N}&\leq\frac{a+N/a}{2},
+    \end{align*}
+pa imamo 
+\begin{equation*}
+    \lfloor\sqrt{N}\rfloor\leq\left\lfloor\frac{a+N/a}{2}\right\rfloor=\left\lfloor\frac{\lfloor a+N/a\rfloor}{2}\right\rfloor
+    =\left\lfloor\frac{a+\lfloor N/a\rfloor}{2}\right\rfloor=g(a)\text.
+\end{equation*}
+\end{proof}
+
+\begin{lema}\label{lm:heron2}
+    Neka je $a\in\mathbb N$ takav da $\lfloor\sqrt{N}\rfloor<a$. Tada $g(a)<a$.
+\end{lema}
+\begin{proof}
+    \begin{align*}
+        \lfloor\sqrt{N}\rfloor<a &\iff \sqrt{N}<a\\
+        &\iff n<a^2\\
+        &\iff n/a<a\\
+        &\iff \lfloor n/a\rfloor < a\\
+        &\iff a+\lfloor n/a\rfloor < 2a\\
+        &\iff \frac{a+\lfloor n/a\rfloor}{2}<a\\
+        &\iff \left\lfloor\frac{a+\lfloor n/a\rfloor}{2}\right\rfloor < a\\
+        &\iff g(a) < a\text.
+    \end{align*}
+\end{proof}
+
+Neka je $a$ bilo koji prirodan broj takav da $\lfloor\sqrt{N}\rfloor\leq a$ i neka je
+\begin{equation*}
+    a_0,a_1,\dotsc
+\end{equation*}
+niz iteriranih vrijednosti dobivenih primjenom funkcije $g$, s početnim uvjetom $a_0=a$ i $a_{i+1}=g(a_i),\,i\geq 0$.
+\begin{lema}\label{lm:heron3}
+    Za sve $i\geq 0$, $\lfloor\sqrt{N}\rfloor\leq a_i$.
+\end{lema}
+\begin{proof}
+    Direktno iz leme \ref{lm:heron2} i početnog uvjeta.
+\end{proof}
+
+\begin{lema}\label{lm:heron4}
+    Za sve $i\geq 0$, $\lfloor\sqrt{N}\rfloor=a_i$ ako i samo ako $a_i \leq a_{i+1}$.
+\end{lema}
+\begin{proof}
+    Po lemi \ref{lm:heron3}, mora biti $\lfloor\sqrt{N}\rfloor < a_i$ ili $\lfloor\sqrt{N}\rfloor = a_i$. Ako je $\lfloor\sqrt{N}\rfloor = a_i$,
+    tada po lemi \ref{lm:heron3} vrijedi $a_i \leq a_{i+1}$. Inače, mora biti $a_{i+1} < a_i$ po lemi \ref{lm:heron2}.
+\end{proof}
+\begin{teorem}[Korektnost Heronove metode]\label{tm:heron}
+    Postoji $i\geq0$ takav da je $a_i$ cjelobrojni korijen od $N$.
+\end{teorem}
+\begin{proof}
+    Iz dobre uređenosti skupa $\mathbb N$ slijedi da postoji $i$ takav da je $a_i$ minimum svih elemenata u nizu $a_0,a_1,\dotsc$
+    To povlači da je $a_i \leq a_{i+1}$, pa je po lemi \ref{lm:heron4} $a_i$ cjelobrojni korijen od $N$.
+\end{proof}
 
 \subsection{Indijski doprinos}
 Negdje u prvim stoljećima nakon Krista, danas nepoznati indijski matematičari izumili su dekadski brojevni sustav. Za razliku od svih prijašnjih brojevnih sustava,
@@ -305,7 +383,7 @@ poziva koliki je $N$, sve do dolaska do baznog slučaja za $1$, uz još dodatnu 
 "brža" indukcija.
 
 Tvrdimo da je moguće doći do istog rezultata koristeći, umjesto opetovanog dekrementiranja argumenta u koraku, njegovo dijeljenje s $4$
-tj.\ bitovni posmak za $2$ udesno, što dovodi do vremenske složenosti $O(\lg\lg N)$\footnote{\log_2 =\lg x} u usporedbi s prethodnom $O(\lg N)$. Osnovna ideja je
+tj.\ bitovni posmak za $2$ udesno, što dovodi do vremenske složenosti $O(\lg\lg N)$\footnote{$\log_2 x=\lg x$} u usporedbi s prethodnom $O(\lg N)$. Osnovna ideja je
 da mi na temelju izračunatog korijena od $\lfloor\frac{N}{4}\rfloor$ možemo dobiti korijen od $N$, što opravdava korištenje potpune
 indukcije na $N$ u svrhu dokaza ovog korisnijeg rezultata. Za provesti tu indukciju, moramo prvo navesti neke elementarne rezultate
 na koje ćemo se pozvati (u donjim iskazima pretpostavljamo da $\mathbb{N}$ uključuje $0$).
@@ -432,15 +510,49 @@ Mi dakle tražimo bitove $x=a_0,\dotsc ,a_n,\,a_i\in\{2^i,0\}$. To radimo tako d
 Kako napredujemo od \emph{viših} bit-pozicija prema nižim, imamo $P_m=P_{m+1}+a_m$, gdje moramo odlučiti je li $a_m=0$ ili je $a_m=2^m$.
 To očito možemo na temelju nejednakosti $(P_{m+1}+2^m)^2 \leq N$ --- ako je ona istinita, $a_m=2^m$, a inače $a_m=0$. Ovo bi bilo dovoljno za
 osnovni iterativni algoritam, ali tada bismo morali u svakom koraku kvadrirati dosadašnju aproksimaciju, što nije nužno ako iskoristimo činjenicu
-da su znamenke u bazi $2$ invarijantne na kvadriranje i da kvadrat aproksimacije možemo lako ažurirati: želimo dobiti $N-P^2_{m-1}$ na temelju
-$N-P^2_m$. Ako stavimo $N-P^2_{m-1}+z=N-P^2_m$, moramo odrediti $z$. Raspisujemo
-\begin{align}
-    x&=P^2_{m-1}-P^2_m\\
-    &=(a_n+\dotsb+a_m+a_{m-1})^2+(a_n+\dotsb+a_m)^2\\
-    &=2(a_n+\dotsb+a_m)a_{m-1}+a^2_{m-1}=2P_ma_{m-1}+a^2_{m-1}\text.
-\end{align}
-Dakle, kada trebamo odabrati $2^m$ ili $0$ za $a_m$, oduzmemo $2P_{m+1}2^m+2^{2m}$ od zadnje zapamćene razlike $N-P^2_{m+1}$ i provjerimo je li rezultat
-veći ili jednak od $0$. Želeći izbjeći množenje (i kvadriranje), 
+da su znamenke u bazi $2$ invarijantne na kvadriranje i da kvadrat aproksimacije možemo lako ažurirati. Uočimo da vrijedi
+\begin{equation}\label{eq:optim1}
+    \begin{aligned}
+    (P_m+a_{m-1})^2 &\leq N\\
+    \iff 2P_ma_{m-1}+a^2_{m-1} &\leq N-P^2_{m-1}-2P_{m+1}a_m-a^2_m\text.
+    \end{aligned}
+\end{equation}
+Dakle, ako želimo brzo otkriti treba li odabrati $2^{m-1}$ ili $0$, treba nam razlika $\Delta_{m-1}$ između desne strane jednadžbe \eqref{eq:optim1}
+za dvije uzastopne aproksimacije. Nalazimo
+\begin{equation}\label{eq:optim2}
+    \begin{aligned}
+    \Delta_{m-1}&=N-P^2_{m+1}-a^2_m-2P_{m+1}a_m-\left(N-P^2_{m+2}-a^2_{m+1}-2P_{m+2}a_{m+1}\right)\\
+    &=P^2_{m+2}-P^2_{m+1}-a^2_m+a^2_{m+1}+2a_{m+1}P_{m+2}-2a_mP_{m+1}\\
+    &=-(2a_mP_{m+1}+a^2_m)\text.
+    \end{aligned}
+\end{equation}
+To znači da u svakoj iteraciji oduzimamo izraz \eqref{eq:optim2} od varijable $op$ inicijalizirane sa $N$ (uočimo da je izraz $0$ kada $a_m=0$, pa ustvari
+ne radimo ništa u tom slučaju). No sada želimo što brže izračunati taj izraz, po mogućnosti bez potrebe ikakvog množenja (i kvadriranja), što je moguće
+inkrementalnim računanjem dviju pomoćnih varijabli, od kojih svaka odgovara jednom pribrojniku u \eqref{eq:optim2}. Konkretno,
+\begin{equation}\label{eq:optim3}
+    \begin{aligned}
+    rezultat_m &= 2a_mP_{m+1}=P_{m+1}2^{m+1}=P_{m+1}2^{m+1}=(P_{m+2}+a_{m+1})2^{m+1}\\
+    &=P_{m+1}\cdot 2^{m+1}+a_{m+1}2^{m+1}\\
+    &=\begin{cases}
+        \frac{rezultat_{m+2}}{2},&\text{ako $a_{m+1}=0$}\\
+        \frac{rezultat_{m+2}}{2} + a_{m+1}2^{m+1},&\text{inače}\text.
+    \end{cases}
+    \end{aligned}
+\end{equation}
+Evidentno je da nam druga varijabla $jedinica$ treba odgovarati izrazu $a_{m+1}2^{m+1}$ koji je jednak $2^{m+1}\cdot 2^{m+1}=4^{m+1}$ jer
+u ovom trenutku ažuriranja znamo da smo odabrali $a_{m+1}=2^{m+1}$ (inače ne bi bilo nikakvog ažuriranja). Stoga na kraju petlje još moramo imati
+\begin{equation}
+    jedinica_m=4^m=\frac{jedinica_{m+1}}{4}\text.
+\end{equation}
+Sada vidimo da u \eqref{eq:optim3} možemo optimalno ažurirati $rezultat$ bez potrebe za množenjem:
+\begin{equation}
+    \begin{cases}
+        rezultat_{m+2}/2,&\text{ako $a_{m+1}=0$}\\
+        rezultat_{m+2}/2 + jedinica_{m+1},&\text{inače}\text.
+    \end{cases}
+\end{equation}
+Očito, sada je moguće izračunati $\Delta$ vrijednost ažuriranja kao $jedinica+rezultat$ u svakoj iteraciji te će na kraju $rezultat$ ujedno i
+predstavljati konačnu (najbolju cjelobrojnu) aproksimaciju korijena $x$.
 
 Iako se čini da ovaj algoritam ne napreduje suviše brzo (ne pogađa inicijalnu aproksimaciju koju zatim profinjuje), njegova je
 glavna prednost to što ima fiksan broj iteracija petlje
@@ -456,14 +568,14 @@ or implement in a way that's inefficient for large inputs~\cite{mdickisqrt}.}{Ma
 Trenutna verzija CPythona --- referentne implementacije virtualnog stroja za programski jezik Python --- koristi zanimljivu varijantu 
 algoritma \ref{alg:isqrt2} za račun cjelobrojnog kvadratnog korijena~\cite{Cpythonisqrt}. Naime, radi se o \emph{adaptivnom} algoritmu
 koji umjesto posmaka za fiksni broj mjesta koristi varijabilni posmak $s$ koji se smanjuje kako algoritam napreduje. Iteracije se baziraju
-na Newtonovoj metodi i koristi se puno brža metoda u posebnom slučaju kada je argument manji od $2^{64}$; naime, Python interno podržava
+na Newtonovoj-Raphsonovoj metodi i koristi se puno brža metoda u posebnom slučaju kada je argument manji od $2^{64}$; naime, Python interno podržava
 cjelobrojnu aritmetiku proizvoljne preciznosti, no raditi račun u proizvoljno visokoj preciznosti kada bi se mogao izvesti i u puno manjoj
 (idealno strojnoj) je rastrošno, pa algoritam ustvari adaptivno povećava preciznost računa. Također postoji posebna, vrlo kratka
 i efikasna varijanta koja se sastoji samo od najosnovnijih aritmetičkih operacija i ne sadrži grananja.
 U samom Pythonu, ova funkcija je dostupna kao \texttt{math.isqrt} od
 verzije 3.8.
 
-TODO: kratka skica dokaza iz komentara cpythona?
+
 
 
 
