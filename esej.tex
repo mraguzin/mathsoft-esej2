@@ -301,7 +301,9 @@ su ubrzo bile implementirane za računala poput EDSAC-a početkom 1950-ih godina
 hardver za brzu aritmetiku s pomičnim zarezom niti su podržavala instrukciju dijeljenja, pa su se tražile metode koje mogu u potpunosti
 izbjeći dijeljenje i po mogućnosti koristiti samo operacije zbrajanja te bitnovnog posmaka.
 
-Jedna takva rana metoda dolazi od ekipe predvođene Wilkesom\footnote{TODO} sa sveučilišta u Cambridgeu odgovorne za EDSAC,
+Jedna takva rana metoda dolazi od ekipe predvođene Wilkesom\footnote{Maurice
+Vincent Wilkes (1913.--2010.), britanski računarski znanstvenik, zaslužan za ideju mikroprogramiranja i računalo EDSAC.}
+sa sveučilišta u Cambridgeu odgovorne za EDSAC,
 inače prvo računalo s pohranjivanjem programa~\cite[str.~32]{ribaric}. Metoda je iterativna i koristi \emph{dvije} varijable te 
 u potpunosti zadovoljava spomenute specifikacije. To uspijeva zahvaljujući nekim osnovnim rezultatima koje ćemo sada izvesti za
 malo općenitiji slučaj izračunavanja $y/x^{1/n},\,n\in\mathbb{N}$, gdje pretpostavljamo da nas zanimaju samo pozitivni cjelobrojni rezultati, pa
@@ -870,28 +872,35 @@ float sqrt2(float x)
 \end{lstlisting}
 \end{figure}
 
-\section{Rezultati mjerenja i zaključak}
-Na kraju sabiremo sva obavljenja mjerenja implementiranih algoritama u tablicu xyz
-\begin{table}[t]
-    %\begin{tabular}{lll}
-    \begin{tabular}{|c|c|c|}
-    \hline
-    \multicolumn{3}{|c|}{\textbf{Rezultati mjerenja}}\\ \hline
-    Algoritam & Vrijeme & Preciznost \\ \hline
-    %\multicolumn{1}{|l}{Algoritam} & Vrijeme & \multicolumn{1}{l|}{Preciznost} \\ \hline
-    %\multicolumn{1}{|l}{}          &         & \multicolumn{1}{l|}{}           \\ \hline
-    \end{tabular}
-\end{table}
-
 \autoref{code:invsqrt} dolazi iz~\cite{walczyk2018improving}, gdje autori razmatraju kako se dolazi do "magične konstante"
 \verb|0x5f375a86| i može li se izvesti neka bolja vrijednost, uz različit broj Newton-Raphson iteracija. Cilj je u tome da se postigne što
 veća preciznost uz što manje iteracija te skupih operacija s pomičnim zarezom općenito; vidimo da \autoref{code:invsqrt} koristi mali
 broj množenja, no taj se broj povećava kako uvodimo više iteracija te zbog toga što na kraju moramo pomnožiti s $x$ ako nas zanima korijen, a ne
 (samo) recipročni korijen, pa treba pronaći dobar balans između broja operacija i tražene preciznosti.
 
-Na kraju valja napomenuti da danas praktički sve arhitekture generalnih procesora imaju ugrađenu instrukciju za vađenje kvadratnog korijena, kao
-i njegove recipročne vrijednosti, koja daje preciznije rezultate i brža je od svih navedenih algoritama za rad s pomičnim zarezom. Ipak, ovakvi
+Na kraju valja napomenuti da danas praktički sve arhitekture generalnih procesora imaju ugrađene instrukcije za vađenje kvadratnog korijena, kao
+i njegove recipročne vrijednosti, koji daju preciznije rezultate i brže su od svih navedenih algoritama za rad s pomičnim zarezom. Ipak, ovakvi
 algoritmi su nužni na mnogim ugradbenim i jednostavnijim sustavima (FPGA i sl.) koji nemaju takve sposobnosti.
+
+\section{Rezultati mjerenja i zaključak}
+Na kraju sabiremo sva obavljenja mjerenja implementiranih algoritama u tablicu xyz
+\begin{table}[t]
+    \center
+    \caption{Tablica vremena i izmjerene greške za obrađene algoritme. Greška je relevantna samo kod algoritama za procjenu realnog korijena i izmjerena
+    je za $x=100000009$. Vremena su srednje vrijednosti nakon $100000000$ iteracija.}
+    \begin{tabular}{|c|c|c|}
+    \hline
+    \multicolumn{3}{|c|}{\textbf{Rezultati mjerenja}}\\ \hline
+    Algoritam & Vrijeme ($\mu s$) & Relativna greška \\ \hline
+    bit-po-bit & $0.0089763$ & $0$ \\ \hline
+    adaptivni  & $0.0219421$ & $0$ \\ \hline
+    fiksni32   & $5\cdot 10^{-10}$ & $0$ \\ \hline
+    %realan1~\eqref{code:sqrt} & $1.109$ & $199.5$ \\ \hline
+    realan1~\eqref{code:sqrt} & $1.109$ & $0.02$ \\ \hline
+    %realan2~\eqref{code:invsqrt} & $1.10208$ & $13.55$ \\ \hline
+    realan2~\eqref{code:invsqrt} & $1.10208$ & $0.001$ \\ \hline
+    \end{tabular}
+\end{table}
 
 
 
