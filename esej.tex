@@ -606,7 +606,7 @@ na Newtonovoj-Raphsonovoj metodi i koristi se puno brža metoda u posebnom sluč
 cjelobrojnu aritmetiku proizvoljne preciznosti, no raditi račun u proizvoljno visokoj preciznosti kada bi se mogao izvesti i u puno manjoj
 (idealno strojnoj) je rastrošno, pa algoritam ustvari adaptivno povećava preciznost računa. Također postoji posebna, vrlo kratka
 i efikasna varijanta koja se sastoji samo od najosnovnijih aritmetičkih operacija i ne sadrži grananja.
-U samom Pythonu, ova funkcija je dostupna kao \texttt{math.isqrt} od verzije 3.8.
+U samom Pythonu, ova funkcija je dostupna kao \verb|math.isqrt| od verzije 3.8.
 
 CPython-ov algoritam se temelji na sličnoj ideji kao prethodni bit-po-bit algoritam, samo što sada ne želimo koristiti fiksni djelitelj
 za dobivanje manjeg korijena iz kojeg se onda izvlači željeni korijen, već želimo u svakoj iteraciji izračunati aproksimaciju od
@@ -886,7 +886,7 @@ broj množenja, no taj se broj povećava kako uvodimo više iteracija te zbog to
 (samo) recipročni korijen, pa treba pronaći dobar balans između broja operacija i tražene preciznosti.
 
 Na kraju valja napomenuti da danas praktički sve arhitekture generalnih procesora imaju ugrađene instrukcije za vađenje kvadratnog korijena, kao
-i njegove recipročne vrijednosti, koji daju preciznije rezultate i brže su od svih navedenih algoritama za rad s pomičnim zarezom. Ipak, ovakvi
+i njegove recipročne vrijednosti, koje daju preciznije rezultate i brže su od svih navedenih algoritama za rad s pomičnim zarezom. Ipak, ovakvi
 algoritmi su i dalje korisni (često i nužni) na mnogim ugradbenim i jednostavnijim sustavima (FPGA i sl.) koji nemaju takve sposobnosti.
 
 \section{Rezultati mjerenja i zaključak}
@@ -894,7 +894,7 @@ algoritmi su i dalje korisni (često i nužni) na mnogim ugradbenim i jednostavn
     \center
     \caption{Tablica vremena i izmjerene greške za obrađene algoritme. Greška je relevantna samo kod algoritama za procjenu realnog korijena i izmjerena
     je za $x=100000009$. Vremena su srednje vrijednosti nakon $100000000$ iteracija. Testovi su izvršeni na AMD Ryzen 3700X procesoru na kodu kompajliranom
-    sa GCC 12 (-O3) na Linuxu 6.1.14.}\label{tbl}
+    sa GCC 12 (\texttt{-O3}) na Linuxu 6.1.14.}\label{tbl}
     \begin{tabular}{|c|c|c|}
     \hline
     \multicolumn{3}{|c|}{\textbf{Rezultati mjerenja}}\\ \hline
@@ -911,7 +911,7 @@ algoritmi su i dalje korisni (često i nužni) na mnogim ugradbenim i jednostavn
     %realan2~\eqref{code:invsqrt} & $1.10208$ & $0.001$ \\ \hline
     \end{tabular}
 \end{table}
-Na kraju sabiremo sva obavljenja mjerenja implementiranih algoritama u tablicu~\ref{tbl}. Vidimo da se možda najviše isplati koristiti neku varijantu
+Na kraju sabiremo sva obavljena mjerenja implementiranih algoritama u tablicu~\ref{tbl}. Vidimo da se možda najviše isplati koristiti neku varijantu
 algoritma koji koristi aproksimaciju recipročne vrijednosti realnog korijena (uz možda drukčije odabranu "magičnu konstantu"), a za cjelobrojni
 korijen u većini primjena treba koristiti \autoref{code:sqrt32}, osim ako nam program već koristi aritmetiku proizvoljne preciznosti, kada
 treba preći na nešto poput \autoref{code:nsqrt}.
@@ -951,7 +951,8 @@ nalazimo:
 	...
 	movd	eax, xmm4
 \end{lstlisting}
-Dakle, tu se radi o jednostavnoj \verb|move| instrukciji, koja je na x86/x64 dozvoljena između općih i XMM (SIMD FPU) registara. Ovo je dakle
+Dakle, tu se radi o jednostavnoj \verb|move| instrukciji, koja je na x86/x64 dozvoljena između općih i XMM (SIMD FPU) registara bez doticaja
+memorije. Ovo je dakle
 optimalan k\^od koji ne bismo mogli ručno bolje napisati.
 
 Odgovor na drugo pitanje doznajemo pregledom asemblera za sve implementacije i ustvrđivanjem da je kompajler zaista inlineao \emph{sve} što 
