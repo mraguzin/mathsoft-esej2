@@ -11,6 +11,7 @@
 \usepackage{algorithm}
 \usepackage{algpseudocode}
 \usepackage{listings}
+\usepackage{tikz}
 
 \definecolor{codegreen}{rgb}{0,0.6,0}
 \definecolor{codegray}{rgb}{0.5,0.5,0.5}
@@ -87,6 +88,7 @@
 }
 
 \title{Korijen --- 1 algoritam, 3 implementacije}
+\author{Mauro Raguzin}
 \date{\today}
 
 \begin{document}
@@ -110,7 +112,7 @@ i neke analize posebno zanimljivih modernih računalnih implementacija te predst
 Pogledat ćemo dvije bitno različite klase algoritama za račun korijena: one namijenjene dobivanju \emph{cjelobrojnog} korijena i općenite
 metode koje daju realan broj (u nekoj reprezentaciji s pomičnim zarezom). Iako je moguće dobiti određenu vrstu povećane preciznosti
 cjelobrojnih algoritama korištenjem brojeva s fiksnim zarezom, takvi algoritmi nisu primjenjivi na jako velikom rasponu brojeva jer uvijek moramo
-fiksno odvojiti cijeli i ne-cijeli dio. Zato se na kraju se bavimo specifično algoritmom koji je namijenjen računu u realnim
+fiksno odvojiti cijeli i ne-cijeli dio. Zato se na kraju bavimo specifično algoritmom koji je namijenjen računu u realnim
 brojevima i samim time mora koristiti reprezentaciju realnih brojeva pomoću \emph{pomičnog} zareza, dostupnu u većini današnjih računala.
 Sljedeća definicija će biti od koristi kroz cijeli rad:
 \begin{definicija}
@@ -390,7 +392,7 @@ u dekadskom brojevnom sustavu, a nakon toga formalizirati točan postupak za nam
 {Kako smo u dekadskom sustavu, znamo da troznamenkasti brojevi mogu imati najviše dvoznamekasti korijen; općenito, $k$-znamenkasti broj
 može imati najviše $\lceil\frac{k}{2}\rceil$-znamenkasti korijen. Mi u biti želimo "riješiti jednadžbu" $(10x+y)^2+z=819$ za $x$ i $y$, gdje je 
 "ostatak" $z$ potreban jer očekujemo da nam argument neće biti savršeni kvadrat. U tu svrhu krećemo od najznačajnije znamenke rješenja
-$x$ --- koja je najveća znamenka koja, kvadrirana i pomnožena sa $100$, daje broj manji ili jednak $891$? Nalazimo da je to $x=2$, pa
+$x$ --- koja je najveća znamenka koja, kvadrirana i pomnožena sa $100$, daje broj manji ili jednak $819$? Nalazimo da je to $x=2$, pa
 uvrstimo to u jednadžbu i tražimo dalje $y$. Budući smo razriješili najznačajniji dio rezultata, možemo oduzeti dobiveni $400$ od $819$,
 dobiti $40y+y^2+z=419$
 i nastaviti pretragu kao prije. Tako nalazimo $y=8$ i, kako uvrštavanje u jednadžbu ne daje točno $419$,
@@ -468,7 +470,7 @@ na koje ćemo se pozvati (u donjim iskazima pretpostavljamo da $\mathbb{N}$ uklj
 
 Sada imamo zgodan algoritam za računati korijene koji je direktno primjenjiv i za ručno računanje, iako najvjerojatnije zahtijeva papir
 za pamćenje rezultata za veće argumente. Vidimo da algoritam napreduje dijeljenjem preostalog dijela argumenta (u potproblemu) s $4$, što
-odgovara bitovnom posmaku za 2 udesno i stoga se lako vizualizira i izvodi u računalu, iako za ljude možda nije najprirordnije raditi u bazi $2$.
+odgovara bitovnom posmaku za 2 udesno i stoga se lako vizualizira i izvodi u računalu, iako za ljude možda nije najprirodnije raditi u bazi $2$.
 U tom slučaju računamo u bazi $10$ i, umjesto $4$, za djelitelja odabiremo $100$ kao prvi savršeni kvadrat te baze i svi ostali rezultati slijede
 na analogan način. Pseudokod generičkog algoritma za bazu $B$ glasi:
 \begin{algorithm}
@@ -770,7 +772,7 @@ u C++-u i uspoređujemo njihove performanse. Sav k\^od i Python skripte za mjere
 \href{https://github.com/mraguzin/mathsoft-esej2}{repozitoriju} ovog rada.
 
 \subsection{Algoritam bit-po-bit}
-\begin{lstlisting}[language=C++, caption=C++ implementacija bit-po-bit algoritma]
+\begin{lstlisting}[language=C++, caption=Bit-po-bit algoritam u C++-u]
 int32_t sqrt(int32_t N)
 {
 	int32_t op = N;
@@ -796,9 +798,10 @@ int32_t sqrt(int32_t N)
 
 \subsection{Rekurzivni Heronov algoritam}
 Ovo je rekurzivna verzija algoritma kojeg koristi CPython, samo bez adaptivnosti za proizvoljne veličine argumenta i u rekurzivnoj izvedbi.
-Samim time, glavna prednost ovog pristupa nije do kraja iskorištena, a rekurzivni pozivi očito koštaju dovoljno da dovedu prosječno vrijeme izvršavanja
+Samim time, glavna prednost ovog pristupa nije do kraja iskorištena, a rekurzivni pozivi očito koštaju dovoljno da prosječno vrijeme izvršavanja
 ovog algoritma za najveće argumente (budući da vrijeme ovdje ovisi o veličini argumenta) premašuje ono od bit-po-bit-algoritma za iste argumente.
-\begin{lstlisting}[language=C++, label=code:nsqrt, caption=Rekurzivna C++20 implementacija Heronove metode]
+\begin{figure}[h]
+\begin{lstlisting}[language=C++, label=code:nsqrt, caption=Rekurzivna Heronova metoda u C++20]
 int nsqrt(unsigned int N)
 {
     if (N < 4)
@@ -808,7 +811,7 @@ int nsqrt(unsigned int N)
     int e = (bitova - 3) >> 2;
     int b = nsqrt(N >> ((e << 1)+2));
 
-    return (b << e) + (N >> (e+2)) / b;
+    return (b << e) + (N >> e+2) / b;
 }
 
 int isqrt(unsigned int N)
@@ -817,14 +820,16 @@ int isqrt(unsigned int N)
     return skoro*skoro <= N ? skoro : skoro - 1;
 }
 \end{lstlisting}
+\end{figure}
 \autoref{code:nsqrt} treba kompajlirati koristeći C++20 kompajler, budući da ovisimo o brzoj funkciji za brojanje vodećih $0$-bitova, koja je pogotovo
 važna u situacijama gdje bi ovaj algoritam bio primijenjen na ulazni cijeli broj proizvoljne duljine, no kako mi koristimo fiksnu (strojnu) preciznost,
-dovoljno nam je koristiti standardiziranu C++ funkciju \texttt{countl\_zero} za tu svrhu, koja će se svesti na minimalan niz instrukcija.
+dovoljno nam je koristiti standardiziranu C++ funkciju \texttt{countl\_zero} za tu svrhu, koja će se prevesti na minimalan niz instrukcija.
 Srednje vrijeme izvršavanja značajno varira i u nekim instancama daje bolje rezultate od bit-po-bit
 algoritma; za stabilizirati ove performanse bi trebalo koristiti iterativnu verziju, što CPython i čini. Nadalje, za strojne brojeve možemo
-primjeniti prije spomenuto "razmotatavanje" rekurzivnih poziva
+primijeniti prije spomenuto "razmotatavanje" rekurzivnih poziva
 u \autoref{code:nsqrt} i tako dobiti (za $32$-bitne brojeve) k\^od iz \autoref{code:sqrt32}.
-\begin{lstlisting}[language=C++, label=code:sqrt32, caption=C++20 implementacija algoritma za $32$-bitne argumente~\cite{mdickpaper}]
+\begin{figure}[h]
+\begin{lstlisting}[language=C++, label=code:sqrt32, caption=Algoritam za $32$-bitne argumente u C++20~\cite{mdickpaper}]
 uint32_t sqrt32(uint32_t N)
 {
     unsigned e = std::countl_zero(N) >> 1;
@@ -838,34 +843,36 @@ uint32_t sqrt32(uint32_t N)
     return a*a <= N ? a : a - 1; // odredimo cjelobrojni korijen iz skoro-korijena
 }
 \end{lstlisting}
-Očekivano, \autoref{code:sqrt32} daje najbolje performanse u mjerenjima.
-
+\end{figure}
+%Očekivano, \autoref{code:sqrt32} daje najbolje performanse u mjerenjima.
 
 \subsection{Algoritmi za realan korijen}
 Ovdje se bavimo implementacijom obrađenih varijanti algoritma za realni korijen, i to samo onih temeljenih na dobrom odabiru "magične konstante"
 koja može služiti kao početna aproksimacija za Newton-Raphsonove iteracije ili jednostavno kao parametar $k$ za dodati bitovnoj reprezentaciji
 broja s pomičnim zarezom na kraju algoritma~\ref{alg:sqrt}.
-\begin{lstlisting}[language=C++, label=code:sqrt, caption=C++20 implementacija direktne aproksimacije realnog korijena]
-float sqrt(float x)
-{
-    int repr = std::bit_cast<int>(x);
-    repr -= 1 << 23;
-    repr >>= 1;
-    repr += 1 << 29;
-
-    return std::bit_cast<float>(repr);
-}
+\begin{figure}[h]
+\begin{lstlisting}[language=C++, label=code:sqrt, caption=Direktna aproksimacija realnog korijena u C++20]
+    float sqrt(float x)
+    {
+        int32_t repr = std::bit_cast<int>(x);
+        repr -= 1 << 23;
+        repr >>= 1;
+        repr += 1 << 29;
+    
+        return std::bit_cast<float>(repr);
+    }
 \end{lstlisting}
+\end{figure}
 
 \begin{figure}[h]
-\begin{lstlisting}[language=C++, label=code:invsqrt, caption=C++20 implementacija aproksimacije korijena preko recipročne vrijednosti]
+\begin{lstlisting}[language=C++, label=code:invsqrt, caption=Aproksimacija korijena preko recipročne vrijednosti u C++20]
 float sqrt2(float x)
 {
     float pola = 0.5f * x;
-    int i = std::bit_cast<int>(x);
+    int32_t i = std::bit_cast<int>(x);
     i = 0x5f375a86 - (i >> 1);
     float reciproc = std::bit_cast<float>(i);
-    reciproc *= 1.5f - pola*reciproc*reciproc;
+    reciproc *= 1.5f - pola*reciproc*reciproc; // Newton-Raphson iteracija; moguce ponoviti vise puta
 
     return x*reciproc;
 }
@@ -880,28 +887,99 @@ broj množenja, no taj se broj povećava kako uvodimo više iteracija te zbog to
 
 Na kraju valja napomenuti da danas praktički sve arhitekture generalnih procesora imaju ugrađene instrukcije za vađenje kvadratnog korijena, kao
 i njegove recipročne vrijednosti, koji daju preciznije rezultate i brže su od svih navedenih algoritama za rad s pomičnim zarezom. Ipak, ovakvi
-algoritmi su nužni na mnogim ugradbenim i jednostavnijim sustavima (FPGA i sl.) koji nemaju takve sposobnosti.
+algoritmi su i dalje korisni (često i nužni) na mnogim ugradbenim i jednostavnijim sustavima (FPGA i sl.) koji nemaju takve sposobnosti.
 
 \section{Rezultati mjerenja i zaključak}
-Na kraju sabiremo sva obavljenja mjerenja implementiranih algoritama u tablicu xyz
 \begin{table}[t]
     \center
     \caption{Tablica vremena i izmjerene greške za obrađene algoritme. Greška je relevantna samo kod algoritama za procjenu realnog korijena i izmjerena
-    je za $x=100000009$. Vremena su srednje vrijednosti nakon $100000000$ iteracija.}
+    je za $x=100000009$. Vremena su srednje vrijednosti nakon $100000000$ iteracija. Testovi su izvršeni na AMD Ryzen 3700X procesoru na kodu kompajliranom
+    sa GCC 12 (-O3) na Linuxu 6.1.14.}\label{tbl}
     \begin{tabular}{|c|c|c|}
     \hline
     \multicolumn{3}{|c|}{\textbf{Rezultati mjerenja}}\\ \hline
-    Algoritam & Vrijeme ($\mu s$) & Relativna greška \\ \hline
-    bit-po-bit & $0.0089763$ & $0$ \\ \hline
-    adaptivni  & $0.0219421$ & $0$ \\ \hline
-    fiksni32   & $5\cdot 10^{-10}$ & $0$ \\ \hline
-    %realan1~\eqref{code:sqrt} & $1.109$ & $199.5$ \\ \hline
-    realan1~\eqref{code:sqrt} & $1.109$ & $0.02$ \\ \hline
-    %realan2~\eqref{code:invsqrt} & $1.10208$ & $13.55$ \\ \hline
-    realan2~\eqref{code:invsqrt} & $1.10208$ & $0.001$ \\ \hline
+    Algoritam & Vrijeme ($\mu s$) & Relativna greška \\ \hline\hline
+    bit-po-bit & $0.0105$ & $0$ \\ \hline
+    adaptivni & $0.0248$ & $0$ \\ \hline
+    fiksni32 & $0.012$ & $0$ \\ \hline
+    realan1~\eqref{code:sqrt} & $0.0007$ & $0.02$ \\ \hline
+    realan2~\eqref{code:invsqrt} & $0.00097$ & $0.001$ \\ \hline
+    %bit-po-bit & $0.0089763$ & $0$ \\ \hline
+    %adaptivni  & $0.0219421$ & $0$ \\ \hline
+    %fiksni32   & $5\cdot 10^{-10}$ & $0$ \\ \hline
+    %realan1~\eqref{code:sqrt} & $1.109$ & $0.02$ \\ \hline
+    %realan2~\eqref{code:invsqrt} & $1.10208$ & $0.001$ \\ \hline
     \end{tabular}
 \end{table}
+Na kraju sabiremo sva obavljenja mjerenja implementiranih algoritama u tablicu~\ref{tbl}. Vidimo da se možda najviše isplati koristiti neku varijantu
+algoritma koji koristi aproksimaciju recipročne vrijednosti realnog korijena (uz možda drukčije odabranu "magičnu konstantu"), a za cjelobrojni
+korijen u većini primjena treba koristiti \autoref{code:sqrt32}, osim ako nam program već koristi aritmetiku proizvoljne preciznosti, kada
+treba preći na nešto poput \autoref{code:nsqrt}.
 
+Zanimljivo je i da \autoref{code:sqrt32} varijanta \emph{nije} brža od ostalih za cjelobrojni korijen! Očito je da se višestruko korištenje dijeljenja, koje se 
+u drugim implementacijama uopće ne koristi, ne isplati za ovako male brojeve; iako smo na taj način teoretski postigli konstantno vrijeme izvođenja,
+ono i dalje koristi najskuplju cjelobrojnu operaciju (dijeljenje), čiji doprinos ukupnom vremenu izvođenja nadmašuje ono koje dobijemo iz petlje/rekurzije
+ostalih implementacija. To je vrlo čest fenomen kod ovakvih algoritama i stoga uvijek treba pažljivo mjeriti vremena izvođenja na konkretnim ciljnim
+platformama.
+
+Možemo zaključiti da smo u ovom eseju prošli kroz povijest nekih zanimljivih algoritama za račun korijena i vidjeli kako se oni mogu razlikovati
+kada su namijenjeni "ručnoj" uporabi naspram onih za računala te koje sve komplikacije mogu nastupiti u potrazi za optimalnim
+(u smislu vremena) algoritmom. To je
+zakomplicirano činjenicom što, kada tražimo \emph{realan} korijen (tj.\ njegovu aproksimaciju), još moramo dobro balansirati vrijeme i preciznost, a
+onda se još tu nekako nađe i prostorna složenost jer često postaje potrebno koristiti tablice za manje vrijednosti ili početne aproksimacije.
+Ako se odlučimo koristiti tablice, može doći i do dodatnih problema u performansama zbog dodatne memorijske ovisnosti i činjenice da će onda
+moći doći do promašaja u korištenju \textsl{cache} memorije, pa takve algoritme treba pažljivo implementirati za specifičnu ciljnu (mikro)arhitekturu.
+
+U svakom slučaju, vidimo da račun korijena predstavlja niz zanimljivih izazova kad god su performanse i preciznost u pitanju, a u općem slučaju čak i
+efikasan račun cjelobrojnog korijena nije sasvim trivijalan, iako se čini da je CPython-ovo rješenje ovog problema (iterativna adaptivna Heronova
+metoda) za sada najefikasnije poznato.
+
+\appendix
+\section{Neki detalji iz generiranog strojnog koda}
+\citat{Što je bilo, opet će biti, i što se činilo, opet će se činiti, i nema ništa novo pod suncem.}{Propovjednik 1:9}
+Zanimljivo je proučiti generirani k\^od koji GCC emitira
+ (u \verb|-O3|, na x64) za neke od implementiranih algoritama. Konkretno, željeli bismo znati odgovore na ova pitanja:
+\begin{enumerate}
+    \item U što se točno prevodi \verb|std::bit_cast| poziv?
+    \item Koliko je agresivan \textsl{inlining}?
+    \item Je li kompajler efektivno dokazao nešto (značajno) više od nas samih u ovom radu?
+\end{enumerate}
+Na prvo pitanje možemo jasno odgovriti nakon brzog preleta kroz \verb|-S| izlaz. Recimo, za relevantan dio asemblera za \autoref{code:invsqrt}
+nalazimo:
+\begin{lstlisting}[label=code:asm1]
+	movaps	xmm6, xmm1
+	...
+	movd	eax, xmm4
+\end{lstlisting}
+Dakle, tu se radi o jednostavnoj \verb|move| instrukciji, koja je na x86/x64 dozvoljena između općih i XMM (SIMD FPU) registara. Ovo je dakle
+optimalan k\^od koji ne bismo mogli ručno bolje napisati.
+
+Odgovor na drugo pitanje doznajemo pregledom asemblera za sve implementacije i ustvrđivanjem da je kompajler zaista inlineao \emph{sve} što 
+inlineati moglo. To uključuje s\^am \verb|std::bit_cast| poziv, koji je svugdje pretvoren u jednu instrukciju (točno koju ovisi o izvornom odnosno
+destinacijskom tipu; u \autoref{code:asm1} vidimo prvu instrukciju za prelazak u \verb|int| iz \verb|float| i drugu za obratan smjer). Štoviše,
+inlineana je i rekurzija u \autoref{code:nsqrt}!
+
+To nas odmah dovodi do trećeg pitanja --- kako se mogao eliminirati rekurzivni poziv? Pa, diskutirali smo da bi za praktičnu implementaciju trebalo
+"razmotati" algoritam u iterativnu verziju, što CPython radi i sadrži jedino takve implementacije za \verb|math.isqrt|. No, ovdje je fascinantno da je
+kompajler sam obavio to razmotavanje i pritom ustvari dokazao neke zanimljive ekvivalencije koje se tiču rekurzivnih relacija i petlji, za koje bi
+trebalo dosta dodatnog formalnog posla na papiru! Ipak, to je napravio na temelju
+činjenice da se funkcija u \autoref{code:nsqrt} može dosta lako učiniti \textsl{tail recursive}, što omogućuje da se tretira kao petlja.
+S tim na umu, kompajler nije napravio sasvim optimalan posao, jer postoji puno kraći iterativni zapis rezultantnog algoritma
+(izveden u potpunosti u~\cite{mdickpaper}) koji uopće ne koristi grananja,
+dok ih GCC-ova transformacija može napraviti maksimalno $8$ po iteraciji! Dakle, iako se na prvu čini da je GCC došao
+do nekog zanimljivog "otkrića" oko našeg
+algoritma koje mu omogućuje njegov puno efikasniji zapis, to ustvari nije istina jer je transformacija dobivena čisto mehaničkim supstitucijama bez daljnjih
+(uspješnih) pokušaja dokaza nekih ljepših/kraćih formi. To je istina čak i pod svim dodatnim provizijama koje C++20 nudi (poput garantirane dvojnokomplementarne
+reprezentacije cijelih brojeva, po prvi puta u povijesti C/C++ standarda) za lakše rezoniranje o aritmetičkim izrazima.
+
+Sve u svemu, možemo zaključiti ovaj rad sa sljedećom mišlju: pažljiv dizajn, formalno modeliranje i dokazivanje svojstava algoritama
+(čak i za naizgled jednostavno i davno riješene probleme poput vađenja korijena)
+od strane \emph{ljudi} koji znaju što žele i raspolažu iskustvom i intuicijom, je i dalje u samoj srži umjetnosti računalnog programiranja. Pritom
+dakako mogu jako dobro pomoći razni računalni alati, uglavnom za automatsku verifikaciju traženih svojstava; to se
+može vidjeti i u spomenutom kodu iz CPython repozitorija, gdje je dan formalan dokaz korektnosti iterativnog algoritma u dokazivaču Lean.
+Time je na vrlo lijep način (kojeg nipošto ne možemo očekivati od primjerice ChatGPT-a)
+zaokružen cijeli postupak dizajna algoritma, efikasne implementacije i dokaza korektnosti za sve ulaze.
+\pagebreak
 
 
 \printbibliography

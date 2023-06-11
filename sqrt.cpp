@@ -1,10 +1,11 @@
 #include <iostream>
+#include <cstdint>
 #include <chrono>
 #include <bit>
 
 float sqrt(float x)
 {
-    int repr = std::bit_cast<int>(x);
+    int32_t repr = std::bit_cast<int>(x);
     repr -= 1 << 23;
     repr >>= 1;
     repr += 1 << 29;
@@ -21,15 +22,17 @@ int main(int argc, char **argv)
 
     float x = std::atof(argv[1]);
     float rez;
+    float sigh = 0;
     int runs = std::atoi(argv[2]);
     auto t1 = std::chrono::steady_clock::now();
     for (int i = 0; i < runs; ++i) {
-        rez = sqrt(x);
+        rez = sqrt(x++);
     }
 
     auto t2 = std::chrono::steady_clock::now();
     std::chrono::duration<double> time = t2 - t1;
-    std::cout << ((time.count()/runs)*1e6) << " " << rez << std::endl;
+    double fintime = time.count() / runs * 1e6;
+    std::cout << fintime << " " << rez << std::endl;
 
     return 0;
 }

@@ -24,15 +24,17 @@ int main(int argc, char **argv)
 
     int32_t N = std::atoi(argv[1]);
     int32_t rez;
+    int sigh = 0;
     int runs = std::atoi(argv[2]);
     auto t1 = std::chrono::steady_clock::now();
     for (int i = 0; i < runs; ++i) {
-        rez = sqrt32(N);
+        rez = sqrt32(N++);
     }
 
     auto t2 = std::chrono::steady_clock::now();
     std::chrono::duration<double> time = t2 - t1;
-    std::cout << time.count()/runs*1e6 << " " << rez << std::endl;
+    double fintime = time.count() / runs * 1e6;
+    std::cout << fintime << " " << rez << std::endl;
 
     return 0;
 }
