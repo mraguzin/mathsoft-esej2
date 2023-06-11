@@ -1,5 +1,7 @@
 *
 !.gitignore
+!*.cpp
+!*.txt
 !esej.tex
 !literatura.bib
 !*.c

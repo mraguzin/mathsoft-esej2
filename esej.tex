@@ -10,6 +10,37 @@
 \usepackage[backend=biber]{biblatex}
 \usepackage{algorithm}
 \usepackage{algpseudocode}
+\usepackage{listings}
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+
+\lstset{style=mystyle}
+\renewcommand\lstlistingname{Implementacija}
+\renewcommand\lstlistlistingname{Implementacije}
+\def\lstlistingautorefname{Impl.}
+
 \hypersetup{
     colorlinks,
     linkcolor={red!50!black},
@@ -124,18 +155,18 @@ u dekadske razlomke)\cite{fowler1998}:
 \begin{equation}\label{eq:babiter}
     \sqrt 2 = \sqrt{\left(\frac32\right)^2 - \frac14}\approx\frac32 - \frac12\times\frac14\times\frac23 = \frac32 - \frac{1}{12} = \frac{17}{12}\text.
 \end{equation}
-Račun započinje uzimanjem početne aproksimacije korijena, $a=\frac32$ u \eqref{eq:babiter}, te uz pretpostavku da je ona veća od prave vrijednosti,
+Račun započinje uzimanjem početne aproksimacije korijena, $a=\frac32$ u~\eqref{eq:babiter}, te uz pretpostavku da je ona veća od prave vrijednosti,
 dodavanjem ostatka $B$ koji nam nije poznat, ali za kojeg znamo da mora biti manji od kvadrata početne aproksimacije. Modernim algebarskim riječnikom,
 ovo odgovara
 \[
     B=a^2-N,
 \]
 gdje odmah vidimo da ovo povlači $a-B+N<N$, što znači da smo sada dobili aproksimaciju koja je manja od prave vrijednosti. Pritom imamo dualnu situaciju
-ako počnemo od manje aproksimacije; slika \ref{sl:babiter} prikazuje najvjerojatniji način na koji su Babilonjani konstruirali i koristili ovaj postupak.
+ako počnemo od manje aproksimacije; slika~\ref{sl:babiter} prikazuje najvjerojatniji način na koji su Babilonjani konstruirali i koristili ovaj postupak.
 %TODO: slika ovdje, sa stranice 6 citiranog članka; prepiši u TikZ i prilagodi tekst!
 
 Dakako, opisan bi račun, radi dobivanja veće preciznosti rezultata, trebalo iterirati,
-uzimanjem dobivene ($\frac{17}{12}$ u \eqref{eq:babiter}) bolje aproksimacije umjesto prethodne
+uzimanjem dobivene ($\frac{17}{12}$ u~\eqref{eq:babiter}) bolje aproksimacije umjesto prethodne
 ($\frac32$) za nastavak računa, no zapisi s takvim postupcima nisu pronađeni,
 vjerojatno zbog toga što se rijetko kada dobije "regularan" međurezultat te zbog toga što
 bi potreban račun bio suviše složen, uključujući množenja za koja nisu postojali podaci u dostupnim tablicama za množenje. Stoga se čini da su 
@@ -201,22 +232,22 @@ niz iteriranih vrijednosti dobivenih primjenom funkcije $g$, s početnim uvjetom
     Za sve $i\geq 0$, $\lfloor\sqrt{N}\rfloor\leq a_i$.
 \end{lema}
 \begin{proof}
-    Direktno iz leme \ref{lm:heron2} i početnog uvjeta.
+    Direktno iz leme~\ref{lm:heron2} i početnog uvjeta.
 \end{proof}
 
 \begin{lema}\label{lm:heron4}
     Za sve $i\geq 0$, $\lfloor\sqrt{N}\rfloor=a_i$ ako i samo ako $a_i \leq a_{i+1}$.
 \end{lema}
 \begin{proof}
-    Po lemi \ref{lm:heron3}, mora biti $\lfloor\sqrt{N}\rfloor < a_i$ ili $\lfloor\sqrt{N}\rfloor = a_i$. Ako je $\lfloor\sqrt{N}\rfloor = a_i$,
-    tada po lemi \ref{lm:heron3} vrijedi $a_i \leq a_{i+1}$. Inače, mora biti $a_{i+1} < a_i$ po lemi \ref{lm:heron2}.
+    Po lemi~\ref{lm:heron3}, mora biti $\lfloor\sqrt{N}\rfloor < a_i$ ili $\lfloor\sqrt{N}\rfloor = a_i$. Ako je $\lfloor\sqrt{N}\rfloor = a_i$,
+    tada po lemi~\ref{lm:heron3} vrijedi $a_i \leq a_{i+1}$. Inače, mora biti $a_{i+1} < a_i$ po lemi~\ref{lm:heron2}.
 \end{proof}
 \begin{teorem}[Korektnost Heronove metode]\label{tm:heron}
     Postoji $i\geq0$ takav da je $a_i$ cjelobrojni korijen od $N$.
 \end{teorem}
 \begin{proof}
     Iz dobre uređenosti skupa $\mathbb N$ slijedi da postoji $i$ takav da je $a_i$ minimum svih elemenata u nizu $a_0,a_1,\dotsc$
-    To povlači da je $a_i \leq a_{i+1}$, pa je po lemi \ref{lm:heron4} $a_i$ cjelobrojni korijen od $N$.
+    To povlači da je $a_i \leq a_{i+1}$, pa je po lemi~\ref{lm:heron4} $a_i$ cjelobrojni korijen od $N$.
 \end{proof}
 
 \subsection{Indijski doprinos}
@@ -284,7 +315,7 @@ Promotrimo dvostruko iterativni proces u varijablama $a_k$ i $c_k$:
         a_{k+1} &= a_k(1 + \alpha c_k)\label{eq:iter1}\\
         (y^n / x)(1 + c_{k+1}) &= a^n_{k+1}\label{eq:iter2}\text.
 \end{align}
-Ako $c_k\to 0$ za $k\to\infty$, onda očito vrijedi $a_k\to y/x^{1/n}$ te iz \eqref{eq:iter1} i \eqref{eq:iter2} lako izvodimo
+Ako $c_k\to 0$ za $k\to\infty$, onda očito vrijedi $a_k\to y/x^{1/n}$ te iz~\eqref{eq:iter1} i~\eqref{eq:iter2} lako izvodimo
 \begin{equation}
     c_{k+1} = (1+c_k)(1+\alpha c_k)^n - 1\text.
 \end{equation}
@@ -294,13 +325,13 @@ Bitno je da osiguramo konvergenciju; može se pokazati da ako $y^2<x<1$ (skalira
 \end{equation}
 Odabirom $\alpha=-1/n$ dobivamo kvadratnu konvergenciju ovog sustava~\cite{gower}.
 
-Uvrštavanjem u \eqref{eq:iter1} i \eqref{eq:iter2}, dobivamo:
+Uvrštavanjem u~\eqref{eq:iter1} i~\eqref{eq:iter2}, dobivamo:
 \begin{align}
     a_{k+1} &= a_k(1-c_k/n)\\
     c_{k+1} &= (1+c_k)(1-c_k/n)^n - 1\text.
 \end{align}
-Sada općenito vidimo da iz \eqref{eq:edsacscale} slijedi
-da su sve vrijednosti niza $c_k$ negativne te da taj niz konvergira ka $0$. Iz \eqref{eq:iter2} pak dobivamo
+Sada općenito vidimo da iz~\eqref{eq:edsacscale} slijedi
+da su sve vrijednosti niza $c_k$ negativne te da taj niz konvergira ka $0$. Iz~\eqref{eq:iter2} pak dobivamo
 $|a_k|^n<|y^n/x|$, iz čega možemo zaključiti da je $|a_k|<1$ (skalirano) čim je konačan rezultat isto takav.
 
 Za dobiti formule specifično za račun kvadratnog korijena od $x$, odabiremo $a_0=y=x$ i $c_0=x-1$ te $n=2$, što nam daje:
@@ -324,7 +355,7 @@ apsolutna vrijednost niza pada) koristeći gornje rezultate o omeđenosti međur
 samo za $0\leq x<3$ po gornjem odabiru početnih uvjeta --- to je jedini raspon unutar kojeg je ova metoda primjenjiva (što se tiče korijena).
 
 Ne samo da ova metoda ima relativno malu stvarnu domenu primjene, ona se također radi preciznosti često mora ograničiti još i više.
-Vidimo da je iteriranje sustava \eqref{eq:sqrtedsac} moguće korištenjem množenja, dijeljenja s potencijama od $2$ te zbrajanja i oduzimanja, što
+Vidimo da je iteriranje sustava~\eqref{eq:sqrtedsac} moguće korištenjem množenja, dijeljenja s potencijama od $2$ te zbrajanja i oduzimanja, što
 je lako za implementirati na svim procesorima. Ipak, ova metoda, zbog korištenja dvije iteracijske varijable, može akumulirati greške za razliku
 od starobabilonske metode. Konvergencija za račun korijena ovom metodom se usporava što je $x$ manji, što znači da bi trebali pred-skalirati argument
 što je više moguće (do gornje granice duljine riječi), obaviti račun i na kraju skalirati natrag; štoviše, nužno je
@@ -336,7 +367,7 @@ kako bi račun korijena bez gubitka prepolovio eksponent.
 Iz svega navedenog možemo uočiti da je područje konvergencije ovog algoritma, pogotovo za nama najzanimljiviji slučaj $n=2$, izrazito usko
 (u tom slučaju vidimo da je riječ o podskupu od $\{x\mid x\in\left[0,3\right>\}$ za kojeg jedino i možemo primijeniti ovaj algoritam), pa je
 zaista bitno primijeniti dosta pred- i post-procesiranja kako bi se izvuklo maksimalno preciznosti iz ovog algoritma.
-Gower u \cite{gower} preporučuje ciljni raspon $(\frac12)^n\leq x<1$.
+Gower u~\cite{gower} preporučuje ciljni raspon $(\frac12)^n\leq x<1$.
 Za računala za koja je
 ovaj algoritam bio
 namijenjen, to je bila i jedina moguća relativno efikasna opcija.
@@ -416,7 +447,7 @@ na koje ćemo se pozvati (u donjim iskazima pretpostavljamo da $\mathbb{N}$ uklj
         (2r)^2 &\leq (x - x \bmod 4) & \text{po \eqref{lm:1}}\\
         x - x \bmod 4 &\leq x & \text{po \eqref{lm:2}}\\
         (2r)^2 &\leq  x\text.&
-    \end{align*} %TODO: ovdje možda staviti brace desno na iz predzadnje dvije činjenice, koristeći NiceArray https://tex.stackexchange.com/q/621786
+    \end{align*}
 
     \paragraph{Slučaj 2: $x \geq (2r+1)^2$}
 
@@ -458,9 +489,9 @@ na analogan način. Pseudokod generičkog algoritma za bazu $B$ glasi:
     \end{algorithmic}
 \end{algorithm}
 
-Jasno, ovo je čisto rekurzivna implementacija teorema \ref{tm:isqrt1} dokazanog indukcijom za koju ne očekujemo jako dobre performanse upravo zbog
-uporabe rekurzije. Usredotočimo se na slučaj za $B=2$ i prevedimo algoritam \ref{alg:isqrt1} u iterativni pseudokod uz nekoliko optimizacija: rezultat
-je algoritam \ref{alg:isqrt2}.
+Jasno, ovo je čisto rekurzivna implementacija teorema~\ref{tm:isqrt1} dokazanog indukcijom za koju ne očekujemo jako dobre performanse upravo zbog
+uporabe rekurzije. Usredotočimo se na slučaj za $B=2$ i prevedimo algoritam~\ref{alg:isqrt1} u iterativni pseudokod uz nekoliko optimizacija: rezultat
+je algoritam~\ref{alg:isqrt2}.
 \begin{algorithm}
     \floatname{algorithm}{Algoritam}
     \caption{Algoritam $\mathsf{isqrt}$ za $B=2$, iterativna varijanta za $32$-bitnu arhitekturu~\cite{guysqrt}}\label{alg:isqrt2}
@@ -484,7 +515,7 @@ je algoritam \ref{alg:isqrt2}.
     \end{algorithmic}
 \end{algorithm}
 
-Objasnimo pobliže što se dogodilo u transformaciji iz algoritma \ref{alg:isqrt1} u algoritam \ref{alg:isqrt2}. Prva očita stvar je da, umjesto kretanja
+Objasnimo pobliže što se dogodilo u transformaciji iz algoritma~\ref{alg:isqrt1} u algoritam~\ref{alg:isqrt2}. Prva očita stvar je da, umjesto kretanja
 od točno najvišeg ne-nula bita od $N$\footnote{U praksi se ovaj algoritam izvodi na računalima gdje ćemo, zbog fiksnih
 i relativno malih širina registara, uvijek kretati od najviše bitovne pozicije (ovo ima smisla do oko $32$ bita).
 Naravno da onda postoje i varijante u kojima se pokušava na razne načine
@@ -499,7 +530,7 @@ kraja algoritma: kada je ostatak bitova iz $jedinica$ kompletno u $0$, više nem
 Dualno, ne zanimaju nas ni najviši $0$-bitovi iz $N$ jer oni ne mogu doprinijeti korijenu, pa se pomičemo po dva bita udesno dok ne "udarimo" u neki 
 par ne-nula bitova iz $N$, pri čemu je $n$ indeks najviše bit-pozicije u $N$. U tom trenutku dakle, nakon završetka prve \textbf{while} petlje,
 znamo par indeksa među kojima je indeks pozicije najvišeg bita u $N$. Sada idemo, unutar iduće petlje, obaviti sve korake dok ne iscrpimo
-sve relevantne parove bitova. Treba objasniti točno što druga petlja radi, jer nije inicijalno očito da ima ikakve veze s algoritmom \ref{alg:isqrt1},
+sve relevantne parove bitova. Treba objasniti točno što druga petlja radi, jer nije inicijalno očito da ima ikakve veze s algoritmom~\ref{alg:isqrt1},
 iako vidimo da se korektno pomičemo po dva bita udesno. Kao prvo, stavimo $N=x^2+r$, gdje $x^2\leq N < (x+1)^2$ i $r$ je "ostatak".
 Mi dakle tražimo bitove $x=a_0,\dotsc ,a_n,\,a_i\in\{2^i,0\}$. To radimo tako da održavamo aproksimaciju $x$-a $P_m=a_n+a_{n-1}+\dotsb+a_m$.
 Kako napredujemo od \emph{viših} bit-pozicija prema nižim, imamo $P_m=P_{m+1}+a_m$, gdje moramo odlučiti je li $a_m=0$ ili je $a_m=2^m$.
@@ -521,9 +552,9 @@ za dvije uzastopne aproksimacije. Nalazimo
     &=-(2a_mP_{m+1}+a^2_m)\text.
     \end{aligned}
 \end{equation}
-To znači da u svakoj iteraciji oduzimamo izraz \eqref{eq:optim2} od varijable $op$ inicijalizirane sa $N$ (uočimo da je izraz $0$ kada $a_m=0$, pa ustvari
+To znači da u svakoj iteraciji oduzimamo izraz~\eqref{eq:optim2} od varijable $op$ inicijalizirane sa $N$ (uočimo da je izraz $0$ kada $a_m=0$, pa ustvari
 ne radimo ništa u tom slučaju). No sada želimo što brže izračunati taj izraz, po mogućnosti bez potrebe ikakvog množenja (i kvadriranja), što je moguće
-inkrementalnim računanjem dviju pomoćnih varijabli, od kojih svaka odgovara jednom pribrojniku u \eqref{eq:optim2}. Konkretno,
+inkrementalnim računanjem dviju pomoćnih varijabli, od kojih svaka odgovara jednom pribrojniku u~\eqref{eq:optim2}. Konkretno,
 \begin{equation}\label{eq:optim3}
     \begin{aligned}
     rezultat_m &= 2a_mP_{m+1}=P_{m+1}2^{m+1}=P_{m+1}2^{m+1}=(P_{m+2}+a_{m+1})2^{m+1}\\
@@ -539,7 +570,7 @@ u ovom trenutku ažuriranja znamo da smo odabrali $a_{m+1}=2^{m+1}$ (inače ne b
 \begin{equation}
     jedinica_m=4^m=\frac{jedinica_{m+1}}{4}\text.
 \end{equation}
-Sada vidimo da u \eqref{eq:optim3} možemo optimalno ažurirati $rezultat$ bez potrebe za množenjem:
+Sada vidimo da u~\eqref{eq:optim3} možemo optimalno ažurirati $rezultat$ bez potrebe za množenjem:
 \begin{equation}
     \begin{cases}
         rezultat_{m+2}/2,&\text{ako $a_{m+1}=0$}\\
@@ -548,8 +579,7 @@ Sada vidimo da u \eqref{eq:optim3} možemo optimalno ažurirati $rezultat$ bez p
 \end{equation}
 Očito, sada je moguće izračunati $\Delta$ vrijednost ažuriranja kao $jedinica+rezultat$ u svakoj iteraciji te će na kraju $rezultat$ ujedno i
 predstavljati konačnu (najbolju cjelobrojnu) aproksimaciju korijena $x$. Napomenimo da bi sve operacije koje uključuju množenje ili dijeljenje s
-potencijom od $2$ trebale biti zamijenjene odgovarajućim bitovnim posmakom u stvarnim implementacijama.%\footnote{To je temelj učinkovitosti
-%ovog algoritma; uočimo također da je moguće umjesto pribrajanja u )
+potencijom od $2$ trebale biti zamijenjene odgovarajućim bitovnim posmakom u stvarnim implementacijama.
 
 Iako se čini da ovaj algoritam ne napreduje suviše brzo (ne pogađa inicijalnu aproksimaciju koju zatim profinjuje), njegova je
 glavna prednost to što ima fiksan broj iteracija petlje
@@ -559,12 +589,14 @@ modernih strojeva koristeći "informiraniju" progresivnu aproksimaciju.
 
 %\subsection{CPython-ov algoritam}
 \subsubsection{Algoritmi s adaptivnom preciznosti}
-\citat{The integer square root is a common number-theoretic primitive, useful for example in primality testing.
+\citat{\begin{otherlanguage}{english}
+    The integer square root is a common number-theoretic primitive, useful for example in primality testing.
 This is something I've had to code up myself multiple times, and is also something that's quite easy to get wrong,
-or implement in a way that's inefficient for large inputs~\cite{mdickisqrt}.}{Mark Dickinson}
+or implement in a way that's inefficient for large inputs~\cite{mdickisqrt}.
+\end{otherlanguage}}{Mark Dickinson}
 
 Trenutna verzija CPythona --- referentne implementacije virtualnog stroja za programski jezik Python --- koristi zanimljivu varijantu 
-algoritma \ref{alg:isqrt2} za račun cjelobrojnog kvadratnog korijena~\cite{Cpythonisqrt}. Naime, radi se o \emph{adaptivnom} algoritmu
+algoritma~\ref{alg:isqrt2} za račun cjelobrojnog kvadratnog korijena~\cite{Cpythonisqrt}. Naime, radi se o \emph{adaptivnom} algoritmu
 koji umjesto posmaka za fiksni broj mjesta koristi varijabilni posmak $s$ koji se smanjuje kako algoritam napreduje. Iteracije se baziraju
 na Newtonovoj-Raphsonovoj metodi i koristi se puno brža metoda u posebnom slučaju kada je argument manji od $2^{64}$; naime, Python interno podržava
 cjelobrojnu aritmetiku proizvoljne preciznosti, no raditi račun u proizvoljno visokoj preciznosti kada bi se mogao izvesti i u puno manjoj
@@ -577,14 +609,14 @@ za dobivanje manjeg korijena iz kojeg se onda izvlači željeni korijen, već ž
 $\lfloor N/4^f\rfloor$ za neki pozitivni $f$ koji opada kako iteracije napreduju te je na kraju $0$. Također, dopuštamo da se konačan
 rezultat računa progresivnim aproksimacijama u svakoj iteraciji, gdje je akumulacija greške kontrolirana i dokazivo omogućuje izbavljanje
 točnog rezultata na samom kraju. Ovaj algoritam 
-koristi te ideje kombinirane s osnovnom Heronovom metodom da izračuna tzv.\ skoro-korijen od $N$, po definiciji iz \cite{mdickpaper}:
+koristi te ideje kombinirane s osnovnom Heronovom metodom da izračuna tzv.\ skoro-korijen od $N$, po definiciji iz~\cite{mdickpaper}:
 \begin{definicija}
     Neka je $N\in\mathbb N$. Kažemo da je $a\in\mathbb N$ \emph{skoro-korijen} od $N$ ako vrijedi 
     \begin{equation*}
-        (a-1)^2 < n < (a+1)^2\text.
+        (a-1)^2 < N < (a+1)^2\text.
     \end{equation*}
 \end{definicija}
-Očito nije problem dobiti cjelobrojni korijen iz skoro-korijena. Idući teorem govori, slično kao \ref{tm:isqrt1} za neadaptivni slučaj,
+Očito nije problem dobiti cjelobrojni korijen iz skoro-korijena. Idući teorem govori, slično kao~\autoref{tm:isqrt1} za neadaptivni slučaj,
 kako dobiti skoro-korijen iz skoro-korijena određenog kvocijenta.
 \begin{teorem}
     Neka su $N,k\in\mathbb N$ i $4k^4 \leq N$. Neka je $b$ skoro-korijen od $\lfloor N/4k^4\rfloor$. Tada je 
@@ -602,7 +634,7 @@ kako dobiti skoro-korijen iz skoro-korijena određenog kvocijenta.
     \begin{equation}\label{eq:py1}
         (b-1)^2 < \frac{N}{4k^2} < (b+1)^2\text.
     \end{equation}
-    Množenjem \eqref{eq:py1} sa $4k^2$ i uzimanjem korijena dobivamo
+    Množenjem~\eqref{eq:py1} sa $4k^2$ i uzimanjem korijena dobivamo
     \begin{equation}
         2k(b-1) < \sqrt{N} < 2k(b+1)
     \end{equation}
@@ -610,7 +642,7 @@ kako dobiti skoro-korijen iz skoro-korijena određenog kvocijenta.
     \begin{equation}\label{eq:py2}
         |2kb - \sqrt{N}| < 2k\text.
     \end{equation}
-    Kvadriranjem i dijeljenjem \eqref{eq:py2} s $4kb$ dobivamo
+    Kvadriranjem i dijeljenjem~\eqref{eq:py2} s $4kb$ dobivamo
     \begin{equation}\label{eq:py3}
         0 \leq kb + \frac{N}{4kb} - \sqrt{N} < k/b,
     \end{equation}
@@ -618,13 +650,13 @@ kako dobiti skoro-korijen iz skoro-korijena određenog kvocijenta.
     \begin{equation}
         -1 < kb + \left\lfloor\frac{N}{4kb}\right\rfloor - \sqrt{N} < k/b\text.
     \end{equation}
-    Po definiciji od $a$ iz \eqref{eq:py3} dobivamo 
+    Po definiciji od $a$ iz~\eqref{eq:py3} dobivamo 
     \begin{equation}\label{eq:py4}
         -1 < a - \sqrt{N} < k/b\text.
     \end{equation}
     
-    Još nam treba činjenica da $k/b\leq1$. Nju možemo dobiti kombiniranjem pretpostavke da je $4k^4 \leq N$ i desne strane iz \eqref{eq:py1},
-    čime dobivamo $k^2 < (b+1)^2\implies k < b+1\implies k\leq b\implies k/b\leq 1$. Konačno, iz \eqref{eq:py4} sada slijedi
+    Još nam treba činjenica da $k/b\leq1$. Nju možemo dobiti kombiniranjem pretpostavke da je $4k^4 \leq N$ i desne strane iz~\eqref{eq:py1},
+    čime dobivamo $k^2 < (b+1)^2\implies k < b+1\implies k\leq b\implies k/b\leq 1$. Konačno, iz~\eqref{eq:py4} sada slijedi
     \begin{equation}
         -1 < a - \sqrt{N} < 1\text.
     \end{equation}
@@ -632,15 +664,15 @@ kako dobiti skoro-korijen iz skoro-korijena određenog kvocijenta.
 
 Slijedi pseudokod rekurzivne verzije algoritma kojeg CPython koristi, iako je u implementaciji korištena \emph{iterativna} varijanta koju nećemo
 dalje analizirati.
-\begin{algorithm}\label{alg:nsqrt}
+\begin{algorithm}
     \floatname{algorithm}{Algoritam}
-    \caption{$\mathsf{nsqrt}$ algoritam za račun skoro-korijena (rekurzivna verzija)~\cite{mdickpaper}}
+    \caption{$\mathsf{nsqrt}$ algoritam za račun skoro-korijena (rekurzivna verzija)~\cite{mdickpaper}}\label{alg:nsqrt}
     \begin{algorithmic}[1]
     \Require $N \geq 0$
-    \If{$n < 4$}
+    \If{$N < 4$}
         \State $rezultat \gets 1$
     \Else
-        \State $e \gets \lfloor(M.bitova - 3) / 4\rfloor$
+        \State $e \gets \lfloor(N.bitova - 3) / 4\rfloor$
         \State $b \gets nsqrt(\lfloor N / 2^{2e+2}\rfloor)$
         \State $rezultat \gets (b \cdot 2^e) + \left\lfloor \dfrac{\lfloor N / 2^{e+2}\rfloor}{b}\right\rfloor$
     \EndIf
@@ -648,14 +680,14 @@ dalje analizirati.
 \end{algorithm}
 Kada dobijemo skoro-korijen ovim algoritmom, a želimo cjelobrojni korijen, samo provjerimo je li kvadrat rezultata veći od argumenta ili ne;
 ako je, moramo ga umanjiti za $1$ za dobiti cjelobrojni korijen.
-U algoritmu \ref{alg:nsqrt} je odabran $k=2^e$ za $e=\lfloor(N.bitova - 3) / 4\rfloor$ kako bi se sva množenja i dijeljenja mogla svesti
+U algoritmu~\ref{alg:nsqrt} je odabran $k=2^e$ za $e=\lfloor(N.bitova - 3) / 4\rfloor$ kako bi se sva množenja i dijeljenja mogla svesti
 na bitovne posmake i kako bi broj iteracija bio što manji. Drugim riječima, pronađen je najveći $k$ koji je potencija od $2$ i koji
 zadovoljava $4k^4 \leq n$. $rezultat$ se dobiva sumiranjem $kb$ sa $\left\lfloor\dfrac{N}{4kb}\right\rfloor$, što sada odgovara rezultatu
 $\mathsf{nsqrt}$ poziva $b$ posmaknutim ulijevo za $e$ mjesta, jer je $k=2^e$, odnosno $n$ posmaknutom udesno za $e+2$, što odgovara
-dijeljenju $4k$, nakon čega dolazi dijeljenje s  $b$.
+dijeljenju s $4k$, nakon čega dolazi dijeljenje s  $b$.
 
 CPython također sadrži posebne slučajeve ovog algoritma za "manje" argumente tj.\ najčešće korištene brojeve koji su direktno hardverski
-podržani (bez potrebe korištenja aritmetike proizvoljne preciznosti). U tim slučajevima možemo jednostavno "razmotati" algoritam \ref{alg:nsqrt} fiksni
+podržani (bez potrebe korištenja aritmetike proizvoljne preciznosti). U tim slučajevima možemo jednostavno "razmotati" algoritam~\ref{alg:nsqrt} fiksni
 broj puta (za kojeg se zna da se uvijek dobiva točan rezultat za npr.\ $32$ ili $64$ bita) i zapisati ga kao konstantan niz naredbi. Vidimo da je to onda,
 barem što se tiče prosječnog slučaja i apsolutne prostorne složenosti, najefikasniji algoritam za cjelobrojni korijen kada radimo s hardverskim
 cijelim brojevima\footnote{Postoji još efikasnija varijacija u terminima ukupnog \emph{broja} (ne i pojedine složenosti!) instrukcija, koja korištenjem jednog
@@ -675,7 +707,7 @@ bilo kakve skupe operacije s pomičnim zarezom, a to su množenje i pogotovo dij
 \subsubsection{Direktna aproksimacija }
 S tim na umu, prvo razmatramo algoritam koji lukavo koristi IEEE 754 reprezentaciju kako bi nakon nekolicine brzih operacija dao iznenađujuće
 dobru aproksimaciju korijena, i to bez korištenja ikakve iterativne metode!
-\begin{algorithm}\label{alg:sqrt}
+\begin{algorithm}
     \floatname{algorithm}{Algoritam}
     \caption{$\mathsf{sqrt}$ algoritam za račun aproksimacije realnog korijena~\cite{lomont}}\label{alg:sqrt}
     \begin{algorithmic}[1]
@@ -687,14 +719,14 @@ dobru aproksimaciju korijena, i to bez korištenja ikakve iterativne metode!
     \State $rezultat \gets \text{broj u IEEE 754 formatu konstruiran iz binarne reprezentacije $repr$}$
     \end{algorithmic}
 \end{algorithm}
-Algoritam \ref{alg:sqrt} se čini poprilično kriptičnim i najvjerojatnije nije odmah jasno kako bi mogao rezultirati nečim blizu korijena od $x$, pa
+Algoritam~\ref{alg:sqrt} se čini poprilično kriptičnim i najvjerojatnije nije odmah jasno kako bi mogao rezultirati nečim blizu korijena od $x$, pa
 ponovimo par osnovnih stvari o IEEE 754 formatu. Po specifikaciji, \texttt{float} je definiran kao $32$-bitni niz u kojem je najviši bit predznaka $P$,
 zatim slijedi $8$ bitova eksponenta $E$ s otklonom od $127$ te konačno $23$ najniža bita \emph{mantise} $M$. Sveukupno dakle, imamo 
 %TODO: treba tikz skica formata ovdje, sa slovnim oznakama dijelova u ćelijama
 \begin{equation}
     x = (2^{23} + M)2^{E-127},
 \end{equation}
-pri čemu treba imati na umu da je $P=0$ zbog nužne pozitivnosti $x$-a te da
+pri čemu treba imati na umu da je nama $P=0$ zbog nužne nenegativnosti $x$-a te da
  cijeli signifikand broja $x$ ustvari ima $24$ bita, pri čemu je najznačajniji implicitno $1$, pa se pamte
 samo niža $23$ bita u mantisi $M$. Kako je $\sqrt{x} = \sqrt{2^{23}+M}\cdot 2^{\frac{E-127}{2}}$, želimo nekako što brže 
 od $x$ doći do rastava na dio bitova koji se tiče samo eksponenta i dio koji se tiče mantise. U tu svrhu možemo jednostavno
@@ -707,14 +739,15 @@ i dobru aproksimaciju korijena mantise:
 \begin{equation}\label{eq:sqrtshift}
     \left(\frac{\frac{x_{repr}}{2^{23}} - 127}{2} + 127\right) \cdot 2^{23} = \frac{x_{repr} - 2^{23}}{2} + 2^{22}\cdot 128\text.
 \end{equation}
-Sada možemo vidjeti da račun i konstante iz \ref{alg:sqrt} odgovaraju upravo desnoj strani u \eqref{eq:sqrtshift} (dakako, taj bi račun u 
-stvarnosti trebalo implementirati isključivo bitovnim posmacima, povrh jednog nužnog zbrajanja).
+Sada možemo vidjeti da račun i konstante iz~\ref{alg:sqrt} odgovaraju upravo desnoj strani u~\eqref{eq:sqrtshift} (dakako, taj bi račun u 
+stvarnosti trebalo implementirati isključivo bitovnim posmacima, pored jednog nužnog zbrajanja).
 
 Metode temeljene na ovakvim trikovima daju jako dobre rezultate aproksimacije, koji postaju tim bolji što bolje odaberemo
-određenu korekcijsku konstantu $k$ koju jednostavno možemo dodati na kraj u \eqref{eq:sqrtshift}. Štoviše, detaljnija analiza iz~\cite{lomont} 
+određenu korekcijsku konstantu $k$ koju jednostavno možemo dodati bitovnoj reprezentaciji u 
+algoritmu~\ref{alg:sqrt} prije pretvaranja u rezultat. Štoviše, detaljnija analiza iz~\cite{lomont} 
  pokazuje da na ovaj način ustvari postižemo po dijelovima linearnu aproksimaciju korijena, gdje se kao sljedeći korak ka poboljšanju
  preciznosti čini poprilično prirodno uzeti Newton-Raphsonovu metodu i onda je iterirati potreban broj puta. Ipak, takav pristup nije optimalan
- za \emph{direktan} račun korijen, već za račun njegove \emph{recipročne} vrijednosti.
+ za \emph{direktan} račun korijena, već za račun njegove \emph{recipročne} vrijednosti.
 
 \subsubsection{Korijen iz recipročnog korijena}
 Ovdje razmatran
@@ -726,12 +759,141 @@ Pri samom računu recipročne vrijednosti koristimo do sada viđene tehnike: New
 trikove vezane za IEEE 754 format, no ovoga si puta zbog rada u realnoj domeni ne možemo priuštiti (nužno dosta velike) tablice u klasičnom smislu,
 već trebamo pronaći dobru (jednu)
 \emph{polaznu vrijednost} aproksimacije. Dapače, ispada da je upravo u tom odabiru moć ovog fascinantnog algoritma: uz samo \emph{jednu} iteraciju
-Newton-Raphsona, postiže se relativna greška od $0.18\%$! Algoritam je implementiran u \ref{sec:invsqrt}, a detaljna analiza preciznosti i ovisnosti
+Newton-Raphsona, postiže se relativna greška od $0.18\%$! Algoritam je implementiran u~\autoref{code:invsqrt}, a detaljna analiza preciznosti i ovisnosti
 o odabranoj "magičnoj konstanti" za inicijalnu aproksimaciju se može pronaći u~\cite{lomont}.
 
 \section{Implementacije i usporedbe}
+Za kraj ovog rada, implementiramo tri glavna pristupa računu (cjelobrojnog ili realnog) korijena uz neke manje varijacije
+u C++-u i uspoređujemo njihove performanse. Sav k\^od i Python skripte za mjerenje se nalaze u
+\href{https://github.com/mraguzin/mathsoft-esej2}{repozitoriju} ovog rada.
 
-%TODO: ubaci primjere i za sve ostale, povijesne sqrt metode! Ima dosta toga u Knuth članku, Fowler...
+\subsection{Algoritam bit-po-bit}
+\begin{lstlisting}[language=C++, caption=C++ implementacija bit-po-bit algoritma]
+int32_t sqrt(int32_t N)
+{
+	int32_t op = N;
+	int32_t rezultat = 0;
+
+	int32_t jedinica = 1 << 30;
+	while (jedinica > op) jedinica >>= 2;
+
+	while (jedinica != 0) {
+		if (op >= rezultat + jedinica) {
+			op -= rezultat + jedinica;
+			rezultat += 2 * jedinica;
+		}
+
+		rezultat >>= 1;
+		jedinica >>= 2;
+	}
+
+	return rezultat;
+}
+\end{lstlisting}
+%Srednje vrijeme računa korijena za ovaj algoritam, kroz $16$ iteracija, je $0.016875\ \mu s$ (ono ne ovisi o veličini argumenta).
+
+\subsection{Rekurzivni Heronov algoritam}
+Ovo je rekurzivna verzija algoritma kojeg koristi CPython, samo bez adaptivnosti za proizvoljne veličine argumenta i u rekurzivnoj izvedbi.
+Samim time, glavna prednost ovog pristupa nije do kraja iskorištena, a rekurzivni pozivi očito koštaju dovoljno da dovedu prosječno vrijeme izvršavanja
+ovog algoritma za najveće argumente (budući da vrijeme ovdje ovisi o veličini argumenta) premašuje ono od bit-po-bit-algoritma za iste argumente.
+\begin{lstlisting}[language=C++, label=code:nsqrt, caption=Rekurzivna C++20 implementacija Heronove metode]
+int nsqrt(unsigned int N)
+{
+    if (N < 4)
+        return 1;
+
+    int bitova = sizeof(int)*8 - std::countl_zero(N);
+    int e = (bitova - 3) >> 2;
+    int b = nsqrt(N >> ((e << 1)+2));
+
+    return (b << e) + (N >> (e+2)) / b;
+}
+
+int isqrt(unsigned int N)
+{
+    int skoro = nsqrt(N);
+    return skoro*skoro <= N ? skoro : skoro - 1;
+}
+\end{lstlisting}
+\autoref{code:nsqrt} treba kompajlirati koristeći C++20 kompajler, budući da ovisimo o brzoj funkciji za brojanje vodećih $0$-bitova, koja je pogotovo
+važna u situacijama gdje bi ovaj algoritam bio primijenjen na ulazni cijeli broj proizvoljne duljine, no kako mi koristimo fiksnu (strojnu) preciznost,
+dovoljno nam je koristiti standardiziranu C++ funkciju \texttt{countl\_zero} za tu svrhu, koja će se svesti na minimalan niz instrukcija.
+Srednje vrijeme izvršavanja značajno varira i u nekim instancama daje bolje rezultate od bit-po-bit
+algoritma; za stabilizirati ove performanse bi trebalo koristiti iterativnu verziju, što CPython i čini. Nadalje, za strojne brojeve možemo
+primjeniti prije spomenuto "razmotatavanje" rekurzivnih poziva
+u \autoref{code:nsqrt} i tako dobiti (za $32$-bitne brojeve) k\^od iz \autoref{code:sqrt32}.
+\begin{lstlisting}[language=C++, label=code:sqrt32, caption=C++20 implementacija algoritma za $32$-bitne argumente~\cite{mdickpaper}]
+uint32_t sqrt32(uint32_t N)
+{
+    unsigned e = std::countl_zero(N) >> 1;
+    unsigned m = N << (e << 1);
+    unsigned a = 1 + (m >> 30);
+    a = (a << 1) + (m >> 27) / a;
+    a = (a << 3) + (m >> 21) / a;
+    a = (a << 7) + (m >> 9) / a;
+    a >>= e;
+
+    return a*a <= N ? a : a - 1; // odredimo cjelobrojni korijen iz skoro-korijena
+}
+\end{lstlisting}
+Očekivano, \autoref{code:sqrt32} daje najbolje performanse u mjerenjima.
+
+
+\subsection{Algoritmi za realan korijen}
+Ovdje se bavimo implementacijom obrađenih varijanti algoritma za realni korijen, i to samo onih temeljenih na dobrom odabiru "magične konstante"
+koja može služiti kao početna aproksimacija za Newton-Raphsonove iteracije ili jednostavno kao parametar $k$ za dodati bitovnoj reprezentaciji
+broja s pomičnim zarezom na kraju algoritma~\ref{alg:sqrt}.
+\begin{lstlisting}[language=C++, label=code:sqrt, caption=C++20 implementacija direktne aproksimacije realnog korijena]
+float sqrt(float x)
+{
+    int repr = std::bit_cast<int>(x);
+    repr -= 1 << 23;
+    repr >>= 1;
+    repr += 1 << 29;
+
+    return std::bit_cast<float>(repr);
+}
+\end{lstlisting}
+
+\begin{figure}[h]
+\begin{lstlisting}[language=C++, label=code:invsqrt, caption=C++20 implementacija aproksimacije korijena preko recipročne vrijednosti]
+float sqrt2(float x)
+{
+    float pola = 0.5f * x;
+    int i = std::bit_cast<int>(x);
+    i = 0x5f375a86 - (i >> 1);
+    float reciproc = std::bit_cast<float>(i);
+    reciproc *= 1.5f - pola*reciproc*reciproc;
+
+    return x*reciproc;
+}
+\end{lstlisting}
+\end{figure}
+
+\section{Rezultati mjerenja i zaključak}
+Na kraju sabiremo sva obavljenja mjerenja implementiranih algoritama u tablicu xyz
+\begin{table}[t]
+    %\begin{tabular}{lll}
+    \begin{tabular}{|c|c|c|}
+    \hline
+    \multicolumn{3}{|c|}{\textbf{Rezultati mjerenja}}\\ \hline
+    Algoritam & Vrijeme & Preciznost \\ \hline
+    %\multicolumn{1}{|l}{Algoritam} & Vrijeme & \multicolumn{1}{l|}{Preciznost} \\ \hline
+    %\multicolumn{1}{|l}{}          &         & \multicolumn{1}{l|}{}           \\ \hline
+    \end{tabular}
+\end{table}
+
+\autoref{code:invsqrt} dolazi iz~\cite{walczyk2018improving}, gdje autori razmatraju kako se dolazi do "magične konstante"
+\verb|0x5f375a86| i može li se izvesti neka bolja vrijednost, uz različit broj Newton-Raphson iteracija. Cilj je u tome da se postigne što
+veća preciznost uz što manje iteracija te skupih operacija s pomičnim zarezom općenito; vidimo da \autoref{code:invsqrt} koristi mali
+broj množenja, no taj se broj povećava kako uvodimo više iteracija te zbog toga što na kraju moramo pomnožiti s $x$ ako nas zanima korijen, a ne
+(samo) recipročni korijen, pa treba pronaći dobar balans između broja operacija i tražene preciznosti.
+
+Na kraju valja napomenuti da danas praktički sve arhitekture generalnih procesora imaju ugrađenu instrukciju za vađenje kvadratnog korijena, kao
+i njegove recipročne vrijednosti, koja daje preciznije rezultate i brža je od svih navedenih algoritama za rad s pomičnim zarezom. Ipak, ovakvi
+algoritmi su nužni na mnogim ugradbenim i jednostavnijim sustavima (FPGA i sl.) koji nemaju takve sposobnosti.
+
+
 
 \printbibliography
 
