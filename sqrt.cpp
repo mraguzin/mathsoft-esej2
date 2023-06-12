@@ -26,7 +26,7 @@ int main(int argc, char **argv)
     int runs = std::atoi(argv[2]);
     auto t1 = std::chrono::steady_clock::now();
     for (int i = 0; i < runs; ++i) {
-        rez = sqrt(x++);
+        rez += sqrt(x++);
     }
 
     auto t2 = std::chrono::steady_clock::now();
