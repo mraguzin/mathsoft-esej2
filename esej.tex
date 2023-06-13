@@ -6,12 +6,12 @@
 \usepackage{mathtools}
 \usepackage{thmtools}
 \usepackage{csquotes}
-\usepackage{xcolor}
 \usepackage[backend=biber]{biblatex}
 \usepackage{algorithm}
 \usepackage{algpseudocode}
 \usepackage{listings}
 \usepackage{tikz}
+\usetikzlibrary{patterns,decorations.pathreplacing}
 
 \definecolor{codegreen}{rgb}{0,0.6,0}
 \definecolor{codegray}{rgb}{0.5,0.5,0.5}
@@ -21,7 +21,8 @@
 \lstdefinestyle{mystyle}{
     backgroundcolor=\color{backcolour},   
     commentstyle=\color{codegreen},
-    keywordstyle=\color{magenta},
+    %keywordstyle=\color{magenta},
+    keywordstyle=\color{blue},
     numberstyle=\tiny\color{codegray},
     stringstyle=\color{codepurple},
     basicstyle=\ttfamily\footnotesize,
@@ -56,16 +57,8 @@
 \declaretheorem[style=definition,sibling=teorem,qed=$\vartriangleleft$]{definicija}
 \declaretheorem[name=Primjer,style=definition]{example}
 
-\newcommand{\T}{^\mathsf T}
-\newcommand{\mat}[1]{%
-    \ifmmode%
-        \mathbf{#1}%
-    \else%
-        $\mathbf{#1}$%
-    \fi%
-}
-\newcommand{\vek}[1]{\mat{#1}}
-\newcommand{\citat}[2]{\begin{quotation}\textit{#1}\end{quotation}\begin{flushright}---#2\end{flushright}}
+%\newcommand{\citat}[2]{\begin{quotation}\textit{#1}\end{quotation}\vspace{-1em}\begin{flushright}---#2\end{flushright}}
+\newcommand{\citat}[2]{\begin{quotation}\textit{#1}\vspace{-1em}\begin{flushright}---#2\end{flushright}\end{quotation}}
 \newcommand{\primjer}[2]{%
     \renewcommand\qedsymbol{$\vartriangleleft$}%
     \begin{example}%
@@ -165,7 +158,12 @@ ovo odgovara
 \]
 gdje odmah vidimo da ovo povlači $a-B+N<N$, što znači da smo sada dobili aproksimaciju koja je manja od prave vrijednosti. Pritom imamo dualnu situaciju
 ako počnemo od manje aproksimacije; slika~\ref{sl:babiter} prikazuje najvjerojatniji način na koji su Babilonjani konstruirali i koristili ovaj postupak.
-%TODO: slika ovdje, sa stranice 6 citiranog članka; prepiši u TikZ i prilagodi tekst!
+\begin{figure}[h]
+    \center
+    \includegraphics[scale=0.5]{babiter}
+    \caption{Najvjerojatnija babilonska geometrijska interpretacija iteriranja opisanog postupka, gledamo "slijeva" tj.\ kada krećemo od aproksimacije
+    \textsf{approx} manje od korijena i dodajemo novi dio \textsf{Bit}. Izvor:~\cite{fowler1998}}\label{sl:babiter}
+\end{figure}
 
 Dakako, opisan bi račun, radi dobivanja veće preciznosti rezultata, trebalo iterirati,
 uzimanjem dobivene ($\frac{17}{12}$ u~\eqref{eq:babiter}) bolje aproksimacije umjesto prethodne
@@ -179,7 +177,7 @@ metodom za račun korijena, potrebnom za evaluaciju poznate Heronove formule za 
 \end{equation*}
 Naime, iz originalnog Heronova opisa riječima, prevodeći opet u modernu algebarsku notaciju, dobivamo formulu $\frac12(a+N/a)$, koja je
 zaista ekvivalentna $a+\frac12(N-a^2)/a$, iz gornjeg opisa iteracije Babilonjana. Ipak, svakako je računski bilo puno složenije izračunati
-$(N-a^2)/a$ od $N/a$. % TODO: spomenuti jako blisku vezu s kasnijom Newtonovom metodom!
+$(N-a^2)/a$ od $N/a$.
 Dakle, račun korijena od $N$ se u oba slučaja svodi na rješavanje rekurzivne relacije
 \begin{equation}
     a_{n+1}=\frac12\left(a_n+\frac{N}{a_n}\right),
@@ -262,10 +260,10 @@ iz starobabilonskog doba, otkriven kao dio tzv.\ Bakhshali rukopisa\footnote{Ova
 Osim algoritma za korijen, sadrži i razne primjere rješavanja diofantskih jednadžbi, kvadratnih jednadžbi te aritmetičkih nizova.},
 najvjerojatnije iz 7.\ stoljeća nakon Krista~\cite{bakhshali}.
 
-\begin{figure}
-    \caption{Fragment Bakhshali rukopisa~\cite{bakhshali}.}
+\begin{figure}[h]
     \center
     \includegraphics[scale=0.5]{bakhshali}
+    \caption{Fragment Bakhshali rukopisa~\cite{bakhshali}.}
 \end{figure}
 
 U modernoj notaciji, algoritam kaže da za izračunati kvadratni korijen broja $q$ treba krenuti s aproksimacijom $x_0$ i zatim izračunati,
@@ -290,7 +288,7 @@ That term wasn't invented until years later. It is serendipity that the shortest
 \end{otherlanguage}}
 {Cleve Moler~\cite{spacewar}}
 
-U ovom odjeljku ćemo razmatrati neke novije pristupe računu korijena, pri čemu mislimo uglavnom na algoritme prilagođene
+U ovom odjeljku ćemo razmatrati neke novije pristupe računu korijena, pri čemu mislimo na algoritme prilagođene
 izvršavanju na digitalnim računalima. Umjesto iscrpnog povijesnog pregleda svih varijanti implementiranih algoritama, usredotočit ćemo se na
 nekolicinu \textsl{sui generis} algoritama i njihovih implementacija, analizirajući
 njihova numerička svojstva i uspoređujući ih s onima iz odjeljka~\ref{sec:hist}. Prvo se bavimo algoritmima primarno namijenjenim računu
@@ -339,12 +337,6 @@ da su sve vrijednosti niza $c_k$ negativne te da taj niz konvergira ka $0$. Iz~\
 $|a_k|^n<|y^n/x|$, iz čega možemo zaključiti da je $|a_k|<1$ (skalirano) čim je konačan rezultat isto takav.
 
 Za dobiti formule specifično za račun kvadratnog korijena od $x$, odabiremo $a_0=y=x$ i $c_0=x-1$ te $n=2$, što nam daje:
-% \begin{equation}
-%     \begin{aligned}\label{eq:sqrtedsac}
-%         a_{k+1} &= a_k\left(1-\frac12 c_k\right)\\
-%         c_{k+1} &= \frac14 c^2_k(c_k-3)\text.
-%     \end{aligned}
-% \end{equation}
 \begin{equation}
 \left.
     \begin{array}{cc}
@@ -724,11 +716,51 @@ dobru aproksimaciju korijena, i to bez korištenja ikakve iterativne metode!
     \end{algorithmic}
 \end{algorithm}
 Algoritam~\ref{alg:sqrt} se čini poprilično kriptičnim i najvjerojatnije nije odmah jasno kako bi mogao rezultirati nečim blizu korijena od $x$, pa
-ponovimo par osnovnih stvari o IEEE 754 formatu. Po specifikaciji, \texttt{float} je definiran kao $32$-bitni niz u kojem je najviši bit predznaka $P$,
+ponovimo par osnovnih stvari o IEEE 754 formatu.
+\begin{figure}[h]
+    \begin{tikzpicture}
+        \draw[thick] (0,0) rectangle (15, 1);
+        \draw[thick] (1,0) -- (1,1);
+        \draw[thick] (5,0) -- (5,1);
+        \draw [thick,
+    decoration={
+        brace,
+        mirror,
+        raise=0.2cm,
+        amplitude=10pt
+    },
+    decorate] (0,0) -- (15,0) node [pos=0.5,anchor=north,yshift=-0.5cm] {$32$ bita}; 
+    \draw [thick,
+    decoration={
+        brace,
+        raise=0.2cm,
+        amplitude=6pt
+    },
+    decorate] (0,1) -- (1,1) node [pos=0.5,anchor=north,yshift=1cm] {$1$ bit}; 
+    \draw [thick,
+    decoration={
+        brace,
+        raise=0.2cm,
+        amplitude=6pt
+    },
+    decorate] (1,1) -- (5,1) node [pos=0.5,anchor=north,yshift=1cm] {$8$ bita}; 
+    \draw [thick,
+    decoration={
+        brace,
+        raise=0.2cm,
+        amplitude=6pt
+    },
+    decorate] (5,1) -- (15,1) node [pos=0.5,anchor=north,yshift=1cm] {$23$ bita}; 
+
+    \node at (0.5,0.5) {$P$};
+    \node at (3,0.5) {$\textcolor{red}{E}$};
+    \node at (10,0.5) {$\textcolor{green}{M}$};
+    \end{tikzpicture}
+\end{figure}
+Po specifikaciji~\cite{goldberg}, \texttt{float} je definiran kao $32$-bitni niz u kojem je najviši bit predznaka $P$,
 zatim slijedi $8$ bitova eksponenta $E$ s otklonom od $127$ te konačno $23$ najniža bita \emph{mantise} $M$. Sveukupno dakle, imamo 
-%TODO: treba tikz skica formata ovdje, sa slovnim oznakama dijelova u ćelijama
 \begin{equation}
-    x = (2^{23} + M)2^{E-127},
+    x = (2^{23} + \textcolor{green}{M})2^{\textcolor{red}{E}-127},
 \end{equation}
 pri čemu treba imati na umu da je nama $P=0$ zbog nužne nenegativnosti $x$-a te da
  cijeli signifikand broja $x$ ustvari ima $24$ bita, pri čemu je najznačajniji implicitno $1$, pa se pamte
@@ -768,11 +800,14 @@ o odabranoj "magičnoj konstanti" za inicijalnu aproksimaciju se može pronaći 
 
 \section{Implementacije i usporedbe}
 Za kraj ovog rada, implementiramo tri glavna pristupa računu (cjelobrojnog ili realnog) korijena uz neke manje varijacije
-u C++-u i uspoređujemo njihove performanse. Sav k\^od i Python skripte za mjerenje se nalaze u
+u C++-u i uspoređujemo njihove performanse. Sav k\^od i Python skripta za mjerenje se nalaze u
 \href{https://github.com/mraguzin/mathsoft-esej2}{repozitoriju} ovog rada.
 
 \subsection{Algoritam bit-po-bit}
-\begin{lstlisting}[language=C++, caption=Bit-po-bit algoritam u C++-u]
+U \autoref{code:bitsqrt} dajemo direktnu implementaciju bit-po-bit algoritma iz~\cite{guysqrt} u C++-u, pri\-la\-gođe\-nu za $32$-bitne \textbf{int}-ove.
+Naravno, pritom koristimo bitovne operacije umjesto množenja i dijeljenja.
+\begin{figure}[h]
+\begin{lstlisting}[language=C++, label=code:bitsqrt, caption=Bit-po-bit algoritam u C++-u]
 int32_t sqrt(int32_t N)
 {
 	int32_t op = N;
@@ -794,10 +829,14 @@ int32_t sqrt(int32_t N)
 	return rezultat;
 }
 \end{lstlisting}
+\end{figure}
 %Srednje vrijeme računa korijena za ovaj algoritam, kroz $16$ iteracija, je $0.016875\ \mu s$ (ono ne ovisi o veličini argumenta).
 
 \subsection{Rekurzivni Heronov algoritam}
-Ovo je rekurzivna verzija algoritma kojeg koristi CPython, samo bez adaptivnosti za proizvoljne veličine argumenta i u rekurzivnoj izvedbi.
+\autoref{code:nsqrt} je rekurzivna verzija algoritma kojeg koristi CPython, samo bez adaptivnosti za proizvoljne veličine argumenta\footnote{U smislu
+da ne podržava rad u aritmetici proizvoljne preciznosti, no algoritam kao takav bi radio i u tom slučaju ako bi umjesto \textbf{unsigned int} supstituirali
+neku našu klasu s odgovarajućim preopterećnim operatorima i funkcijama koja predstavlja proizvoljno "široke" cijele brojeve.} 
+i u rekurzivnoj izvedbi.
 Samim time, glavna prednost ovog pristupa nije do kraja iskorištena, a rekurzivni pozivi očito koštaju dovoljno da prosječno vrijeme izvršavanja
 ovog algoritma za najveće argumente (budući da vrijeme ovdje ovisi o veličini argumenta) premašuje ono od bit-po-bit-algoritma za iste argumente.
 \begin{figure}[h]
@@ -823,7 +862,8 @@ int isqrt(unsigned int N)
 \end{figure}
 \autoref{code:nsqrt} treba kompajlirati koristeći C++20 kompajler, budući da ovisimo o brzoj funkciji za brojanje vodećih $0$-bitova, koja je pogotovo
 važna u situacijama gdje bi ovaj algoritam bio primijenjen na ulazni cijeli broj proizvoljne duljine. No kako mi koristimo fiksnu (strojnu) preciznost,
-dovoljno nam je koristiti standardiziranu C++ funkciju \texttt{countl\_zero} za tu svrhu, koja će se prevesti u minimalan niz instrukcija.
+dovoljno nam je koristiti standardiziranu C++ funkciju \texttt{countl\_zero} za tu svrhu, koja će se prevesti u minimalan niz instrukcija\footnote{Ako
+koristimo \texttt{-march=native} na modernijim x64 procesorima, ova se funkcija svodi na \emph{jednu} \texttt{lznct} instrukciju.}.
 Srednje vrijeme izvršavanja značajno varira te bi radi poboljšanja i stabilizacije performansi trebalo koristiti iterativnu verziju,
 što CPython i čini. Nadalje, za strojne brojeve možemo
 primijeniti prije spomenuto "razmotatavanje" rekurzivnih poziva
@@ -883,7 +923,9 @@ float sqrt2(float x)
 \verb|0x5f375a86| i može li se izvesti neka bolja vrijednost, uz različit broj Newton-Raphson iteracija. Cilj je postići što
 veću preciznost uz što manje iteracija te skupih operacija s pomičnim zarezom općenito; vidimo da \autoref{code:invsqrt} koristi mali
 broj množenja, no taj se broj povećava kako uvodimo više iteracija te zbog toga što na kraju moramo pomnožiti s $x$ ako nas zanima korijen, a ne
-(samo) recipročni korijen, pa treba pronaći dobar balans između broja operacija i tražene preciznosti.
+(samo) recipročni korijen, pa treba pronaći dobar balans između broja operacija i tražene preciznosti. Čak i ako ispadne da je \autoref{code:invsqrt}
+nešto sporiji od \autoref{code:sqrt}, on će tipično biti puno veće preciznosti i mogao bi nam u tom vremenu dati i korijen i njegovu recipročnu vrijednost,
+što može biti jako korisno u npr.\ računalnoj grafici.
 
 Na kraju valja napomenuti da danas praktički sve arhitekture generalnih procesora imaju ugrađene instrukcije za vađenje kvadratnog korijena, kao
 i njegove recipročne vrijednosti, koje daju preciznije rezultate i brže su od svih navedenih algoritama za rad s pomičnim zarezom. Ipak, ovakvi
@@ -892,9 +934,7 @@ algoritmi su i dalje korisni (često i nužni) na mnogim ugradbenim i jednostavn
 \section{Rezultati mjerenja i zaključak}
 \begin{table}[t]
     \center
-    \caption{Tablica vremena i izmjerene greške za obrađene algoritme. Greška je relevantna samo kod algoritama za procjenu realnog korijena i izmjerena
-    je za $x=100000009$. Vremena su srednje vrijednosti nakon $100000000$ iteracija. Testovi su izvršeni na AMD Ryzen 3700X procesoru na kodu kompajliranom
-    sa GCC 12 (\texttt{-O3}) na Linuxu 6.1.14.}\label{tbl}
+    
     \begin{tabular}{|c|c|c|}
     \hline
     \multicolumn{3}{|c|}{\textbf{Rezultati mjerenja}}\\ \hline
@@ -910,6 +950,9 @@ algoritmi su i dalje korisni (često i nužni) na mnogim ugradbenim i jednostavn
     %realan1~\eqref{code:sqrt} & $1.109$ & $0.02$ \\ \hline
     %realan2~\eqref{code:invsqrt} & $1.10208$ & $0.001$ \\ \hline
     \end{tabular}
+    \caption{Tablica vremena i izmjerene greške za obrađene algoritme. Greška je relevantna samo kod algoritama za procjenu realnog korijena i izmjerena
+    je za $x=100000009$. Vremena su srednje vrijednosti nakon $10^8$ iteracija. Testovi su izvršeni na AMD Ryzen 3700X procesoru na kodu kompajliranom
+    sa GCC 12 (\texttt{-O3}) na Linuxu 6.1.14.}\label{tbl}
 \end{table}
 Na kraju sabiremo sva obavljena mjerenja implementiranih algoritama u tablicu~\ref{tbl}. Vidimo da se možda najviše isplati koristiti neku varijantu
 algoritma koji koristi aproksimaciju recipročne vrijednosti realnog korijena (uz možda drukčije odabranu "magičnu konstantu"), a za cjelobrojni
@@ -955,7 +998,7 @@ Dakle, tu se radi o jednostavnoj \verb|move| instrukciji, koja je na x86/x64 doz
 memorije. Ovo je dakle
 optimalan k\^od koji ne bismo mogli ručno bolje napisati.
 
-Odgovor na drugo pitanje doznajemo pregledom asemblera za sve implementacije i ustvrđivanjem da je kompajler zaista inlineao \emph{sve} što 
+Odgovor na drugo pitanje doznajemo pregledom asemblera za sve implementacije i ustvrđivanjem da je kompajler zaista inlineao \emph{sve} što se
 inlineati moglo. To uključuje s\^am \verb|std::bit_cast| poziv, koji je svugdje pretvoren u jednu instrukciju (točno koju ovisi o izvornom odnosno
 destinacijskom tipu; u \autoref{code:asm1} vidimo prvu instrukciju za prelazak u \verb|int| iz \verb|float| i drugu za obratan smjer). Štoviše,
 inlineana je i rekurzija u \autoref{code:nsqrt}!
@@ -965,7 +1008,7 @@ To nas odmah dovodi do trećeg pitanja --- kako se mogao eliminirati rekurzivni 
 kompajler sam obavio to razmotavanje i pritom ustvari dokazao neke zanimljive ekvivalencije koje se tiču rekurzivnih relacija i petlji, za koje bi
 trebalo dosta dodatnog formalnog posla na papiru! Ipak, to je napravio na temelju
 činjenice da se funkcija u \autoref{code:nsqrt} može dosta lako učiniti \textsl{tail recursive} (plus dijeljenje na kraju),
-što omogućuje da se tretira kao petlja.
+što omogućuje da se u generiranom kodu tretira kao petlja.
 S tim na umu, kompajler nije napravio sasvim optimalan posao, jer postoji puno kraći iterativni zapis rezultantnog algoritma
 (izveden u potpunosti u~\cite{mdickpaper}) koji uopće ne koristi grananja,
 dok ih GCC-ova transformacija može napraviti maksimalno $8$ po iteraciji! Dakle, iako se na prvu čini da je GCC došao
