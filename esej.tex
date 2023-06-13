@@ -109,7 +109,7 @@ fiksno odvojiti cijeli i ne-cijeli dio. Zato se na kraju bavimo specifično algo
 brojevima i samim time mora koristiti reprezentaciju realnih brojeva pomoću \emph{pomičnog} zareza, dostupnu u većini današnjih računala.
 Sljedeća definicija će biti od koristi kroz cijeli rad:
 \begin{definicija}
-    Neka je $N\in\mathbb{N}$. Kažemo da je $x$ cjelobrojni (kvadratni) korijen od $N$ ako vrijedi
+    Neka je $N\in\mathbb{N}$. Kažemo da je $x$ \emph{cjelobrojni} (kvadratni) korijen od $N$ ako vrijedi\footnote{Smatramo da je $0$ prirodan broj.}
     \begin{equation*}
         x^2 \leq N < (x+1)^2\text.
     \end{equation*}
@@ -658,7 +658,7 @@ kako dobiti skoro-korijen iz skoro-korijena određenog kvocijenta.
     \end{equation}
 \end{proof}
 
-Slijedi pseudokod rekurzivne verzije algoritma kojeg CPython koristi, iako je u implementaciji korištena \emph{iterativna} varijanta koju nećemo
+Slijedi pseudokod rekurzivne verzije algoritma kojeg CPython koristi, iako je u njihovoj implementaciji korištena \emph{iterativna} varijanta koju nećemo
 dalje analizirati.
 \begin{algorithm}
     \floatname{algorithm}{Algoritam}
@@ -716,7 +716,7 @@ dobru aproksimaciju korijena, i to bez korištenja ikakve iterativne metode!
     \end{algorithmic}
 \end{algorithm}
 Algoritam~\ref{alg:sqrt} se čini poprilično kriptičnim i najvjerojatnije nije odmah jasno kako bi mogao rezultirati nečim blizu korijena od $x$, pa
-ponovimo par osnovnih stvari o IEEE 754 formatu.
+ponovimo par osnovnih stvari o IEEE 754 formatu broja.
 \begin{figure}[h]
     \begin{tikzpicture}
         \draw[thick] (0,0) rectangle (15, 1);
@@ -754,13 +754,13 @@ ponovimo par osnovnih stvari o IEEE 754 formatu.
 
     \node at (0.5,0.5) {$P$};
     \node at (3,0.5) {$\textcolor{red}{E}$};
-    \node at (10,0.5) {$\textcolor{green}{M}$};
+    \node at (10,0.5) {$\textcolor{blue}{M}$};
     \end{tikzpicture}
 \end{figure}
 Po specifikaciji~\cite{goldberg}, \texttt{float} je definiran kao $32$-bitni niz u kojem je najviši bit predznaka $P$,
 zatim slijedi $8$ bitova eksponenta $E$ s otklonom od $127$ te konačno $23$ najniža bita \emph{mantise} $M$. Sveukupno dakle, imamo 
 \begin{equation}
-    x = (2^{23} + \textcolor{green}{M})2^{\textcolor{red}{E}-127},
+    x = (-1)^P(2^{23} + \textcolor{blue}{M})2^{\textcolor{red}{E}-127},
 \end{equation}
 pri čemu treba imati na umu da je nama $P=0$ zbog nužne nenegativnosti $x$-a te da
  cijeli signifikand broja $x$ ustvari ima $24$ bita, pri čemu je najznačajniji implicitno $1$, pa se pamte
@@ -800,7 +800,7 @@ o odabranoj "magičnoj konstanti" za inicijalnu aproksimaciju se može pronaći 
 
 \section{Implementacije i usporedbe}
 Za kraj ovog rada, implementiramo tri glavna pristupa računu (cjelobrojnog ili realnog) korijena uz neke manje varijacije
-u C++-u i uspoređujemo njihove performanse. Sav k\^od i Python skripta za mjerenje se nalaze u
+u C++-u i uspoređujemo njihove performanse. Sav k\^od i Python skripta za mjerenje vremena se nalaze u
 \href{https://github.com/mraguzin/mathsoft-esej2}{repozitoriju} ovog rada.
 
 \subsection{Algoritam bit-po-bit}
@@ -931,7 +931,7 @@ Na kraju valja napomenuti da danas praktički sve arhitekture generalnih proceso
 i njegove recipročne vrijednosti, koje daju preciznije rezultate i brže su od svih navedenih algoritama za rad s pomičnim zarezom. Ipak, ovakvi
 algoritmi su i dalje korisni (često i nužni) na mnogim ugradbenim i jednostavnijim sustavima (FPGA i sl.) koji nemaju takve sposobnosti.
 
-\section{Rezultati mjerenja i zaključak}
+\subsection{Rezultati mjerenja i zaključak}
 \begin{table}[t]
     \center
     
@@ -950,7 +950,7 @@ algoritmi su i dalje korisni (često i nužni) na mnogim ugradbenim i jednostavn
     %realan1~\eqref{code:sqrt} & $1.109$ & $0.02$ \\ \hline
     %realan2~\eqref{code:invsqrt} & $1.10208$ & $0.001$ \\ \hline
     \end{tabular}
-    \caption{Tablica vremena i izmjerene greške za obrađene algoritme. Greška je relevantna samo kod algoritama za procjenu realnog korijena i izmjerena
+    \caption{Vremena i izmjerene greške za obrađene algoritme. Greška je relevantna samo kod algoritama za procjenu realnog korijena i izmjerena
     je za $x=100000009$. Vremena su srednje vrijednosti nakon $10^8$ iteracija. Testovi su izvršeni na AMD Ryzen 3700X procesoru na kodu kompajliranom
     sa GCC 12 (\texttt{-O3}) na Linuxu 6.1.14.}\label{tbl}
 \end{table}
@@ -998,10 +998,10 @@ Dakle, tu se radi o jednostavnoj \verb|move| instrukciji, koja je na x86/x64 doz
 memorije. Ovo je dakle
 optimalan k\^od koji ne bismo mogli ručno bolje napisati.
 
-Odgovor na drugo pitanje doznajemo pregledom asemblera za sve implementacije i ustvrđivanjem da je kompajler zaista inlineao \emph{sve} što se
-inlineati moglo. To uključuje s\^am \verb|std::bit_cast| poziv, koji je svugdje pretvoren u jednu instrukciju (točno koju ovisi o izvornom odnosno
+Odgovor na drugo pitanje doznajemo pregledom asemblera za sve implementacije i ustvrđivanjem da je kompajler zaista \textsl{inline}ao \emph{sve} što se
+\textsl{inline}ati moglo. To uključuje s\^am \verb|std::bit_cast| poziv, koji je svugdje pretvoren u jednu instrukciju (točno koju ovisi o izvornom odnosno
 destinacijskom tipu; u \autoref{code:asm1} vidimo prvu instrukciju za prelazak u \verb|int| iz \verb|float| i drugu za obratan smjer). Štoviše,
-inlineana je i rekurzija u \autoref{code:nsqrt}!
+\textsl{inline}ana je i rekurzija u \autoref{code:nsqrt}!
 
 To nas odmah dovodi do trećeg pitanja --- kako se mogao eliminirati rekurzivni poziv? Pa, diskutirali smo da bi za praktičnu implementaciju trebalo
 "razmotati" algoritam u iterativnu verziju, što CPython radi i sadrži jedino takve implementacije za \verb|math.isqrt|. No, ovdje je fascinantno da je
